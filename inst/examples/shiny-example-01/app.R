@@ -2,7 +2,11 @@ library(shiny)
 library(jointR)
 
 server <- function(input, output) {
-  output$jnt1 <- renderJointCanvas(jointCanvas(''))
+
+  output$jnt1 <- renderJointCanvas({
+    jointCanvas(gridsize = 1)
+  })
+
 }
 
 ui <- shinyUI(

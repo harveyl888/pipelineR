@@ -29,7 +29,7 @@ HTMLWidgets.widget({
         width: 600,
         height: 200,
         model: graph,
-        gridSize: 10
+        gridSize: x.gs
     });
 
     // create a couple of rectangles and join them

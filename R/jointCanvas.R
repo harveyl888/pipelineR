@@ -5,17 +5,17 @@
 #' @import htmlwidgets
 #'
 #' @export
-jointCanvas <- function(message, width = NULL, height = NULL) {
+jointCanvas <- function(gridsize = 10, width = NULL, height = NULL) {
 
   # forward options using x
   x = list(
-    message = message
+    gs = gridsize
   )
 
   # create widget
   htmlwidgets::createWidget(
     name = 'jointCanvas',
-    x,
+    x = x,
     width = width,
     height = height,
     package = 'jointR'
