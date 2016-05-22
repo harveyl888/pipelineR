@@ -32,7 +32,15 @@ HTMLWidgets.widget({
         gridSize: x.gridSize,
         markAvailable: x.markAvailable,
         restrictTranslate: x.restrictTranslate,
-        multiLinks: x.multiLinks
+        multiLinks: x.multiLinks,
+        validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+          // Prevent linking from input ports.
+          if (magnetS && magnetS.getAttribute('type') === 'input') return false;
+          // Prevent linking from output ports to input ports within one element.
+          if (cellViewS === cellViewT) return false;
+          // Prevent linking to input ports.
+          return magnetT && magnetT.getAttribute('type') === 'input';
+        }
     });
 
     // create a couple of rectangles and join them
@@ -54,20 +62,22 @@ HTMLWidgets.widget({
 */
 
 
+
         var m1 = new joint.shapes.devs.Model({
         position: { x: 50, y: 50 },
         size: { width: 90, height: 90 },
         inPorts: ['in1','in2'],
         outPorts: ['out'],
         attrs: {
-            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 },
+            '.label': { text: 'Model 1', 'ref-x': .4, 'ref-y': .2 },
             rect: { fill: '#2ECC71' },
-            '.inPorts circle': { fill: '#16A085' },
-            '.outPorts circle': { fill: '#E74C3C' }
+            '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
+            '.outPorts circle': { fill: '#E74C3C', type: 'output' }
         }
     });
+
     var m2 = m1.clone();
-    m2.translate(300, 0);
+    m2.translate(300, 0).attr('.label/text', 'Model 2');
     graph.addCells([m1, m2]);
 
 
