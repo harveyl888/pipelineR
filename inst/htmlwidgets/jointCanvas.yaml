@@ -12,3 +12,7 @@ dependencies:
    src: htmlwidgets/lib/joint-0.9.6
    script: joint.min.js
    stylesheet: joint.min.css
+ - name: jointExtend
+   version: 0.1
+   src: htmlwidgets/lib/joint-0.9.6
+   stylesheet: joint_extend.css

@@ -4,7 +4,7 @@ library(jointR)
 server <- function(input, output) {
 
   output$jnt1 <- renderJointCanvas({
-    jointCanvas(gridSize = 1, markAvailable = FALSE, restrictTranslate = TRUE, multiLinks = FALSE)
+    jointCanvas(gridSize = 1, markAvailable = TRUE, restrictTranslate = TRUE, multiLinks = FALSE)
   })
 
 }
