@@ -7,13 +7,18 @@ server <- function(input, output) {
     jointCanvas(gridSize = 1, markAvailable = TRUE, restrictTranslate = TRUE, multiLinks = FALSE)
   })
 
+  output$txtOut <- renderPrint({
+    input$jnt1_pipeline
+  })
+
 }
 
 ui <- shinyUI(
   fluidPage(
     h5('text at top'),
     jointCanvasOutput('jnt1', width=1000, height=300),
-    h5('text at bottom')
+    h5('text at bottom'),
+    verbatimTextOutput('txtOut')
   )
 )
 

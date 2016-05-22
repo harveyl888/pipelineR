@@ -80,6 +80,26 @@ HTMLWidgets.widget({
     m2.translate(300, 0).attr('.label/text', 'Model 2');
     graph.addCells([m1, m2]);
 
+    var outputId = id + '_pipeline';
+
+    // update pipeline output on any event
+    graph.on('all', function(eventName, cell) {
+      var pipelineLinks = graph.getLinks();
+      var output = {
+          pipeline: []
+      };
+      for (var i in pipelineLinks) {
+        var link = pipelineLinks[i];
+        output.pipeline.push({
+          "source_id" : link.get('source').id,
+          "source_port" : link.get('source').port,
+          "target_id" : link.get('target').id,
+          "target_port" : link.get('target').port
+        });
+      }
+
+      Shiny.onInputChange(outputId, output);
+    });
 
       },
 
