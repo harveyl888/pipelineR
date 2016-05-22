@@ -12,7 +12,7 @@ server <- function(input, output) {
 ui <- shinyUI(
   fluidPage(
     h5('text at top'),
-    jointCanvasOutput('jnt1', width=600, height=300),
+    jointCanvasOutput('jnt1', width=1000, height=300),
     h5('text at bottom')
   )
 )

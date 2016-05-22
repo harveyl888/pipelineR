@@ -26,8 +26,8 @@ HTMLWidgets.widget({
         // define the paper and assign to div element
         var paper = new joint.dia.Paper({
         el: p,
-        width: 600,
-        height: 200,
+        width: el.offsetWidth,
+        height: el.offsetHeight,
         model: graph,
         gridSize: x.gridSize,
         markAvailable: x.markAvailable,
