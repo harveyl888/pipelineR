@@ -5,11 +5,19 @@
 #' @import htmlwidgets
 #'
 #' @export
-jointCanvas <- function(gridsize = 10, width = NULL, height = NULL) {
+jointCanvas <- function(gridSize = 10,
+                        markAvailable = TRUE,
+                        restrictTranslate = FALSE,
+                        multiLinks = FALSE,
+                        width = NULL,
+                        height = NULL) {
 
   # forward options using x
   x = list(
-    gs = gridsize
+    gridSize = gridSize,
+    markAvailable = markAvailable,
+    restrictTranslate = restrictTranslate,
+    multiLinks = multiLinks
   )
 
   # create widget

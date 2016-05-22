@@ -29,7 +29,10 @@ HTMLWidgets.widget({
         width: 600,
         height: 200,
         model: graph,
-        gridSize: x.gs
+        gridSize: x.gridSize,
+        markAvailable: x.markAvailable,
+        restrictTranslate: x.restrictTranslate,
+        multiLinks: x.multiLinks
     });
 
     // create a couple of rectangles and join them
