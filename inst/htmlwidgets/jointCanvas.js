@@ -36,7 +36,7 @@ HTMLWidgets.widget({
     });
 
     // create a couple of rectangles and join them
-    var rect = new joint.shapes.basic.Rect({
+/*    var rect = new joint.shapes.basic.Rect({
         position: { x: 100, y: 30 },
         size: { width: 100, height: 30 },
         attrs: { rect: { fill: 'blue' }, text: { text: 'my box', fill: 'white' } }
@@ -51,6 +51,25 @@ HTMLWidgets.widget({
     });
 
     graph.addCells([rect, rect2, link]);
+*/
+
+
+        var m1 = new joint.shapes.devs.Model({
+        position: { x: 50, y: 50 },
+        size: { width: 90, height: 90 },
+        inPorts: ['in1','in2'],
+        outPorts: ['out'],
+        attrs: {
+            '.label': { text: 'Model', 'ref-x': .4, 'ref-y': .2 },
+            rect: { fill: '#2ECC71' },
+            '.inPorts circle': { fill: '#16A085' },
+            '.outPorts circle': { fill: '#E74C3C' }
+        }
+    });
+    var m2 = m1.clone();
+    m2.translate(300, 0);
+    graph.addCells([m1, m2]);
+
 
       },
 
