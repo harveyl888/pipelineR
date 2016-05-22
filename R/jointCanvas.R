@@ -9,6 +9,7 @@ jointCanvas <- function(gridSize = 10,
                         markAvailable = TRUE,
                         restrictTranslate = FALSE,
                         multiLinks = FALSE,
+                        border = FALSE,
                         width = NULL,
                         height = NULL) {
 
@@ -17,7 +18,8 @@ jointCanvas <- function(gridSize = 10,
     gridSize = gridSize,
     markAvailable = markAvailable,
     restrictTranslate = restrictTranslate,
-    multiLinks = multiLinks
+    multiLinks = multiLinks,
+    border = border
   )
 
   # create widget

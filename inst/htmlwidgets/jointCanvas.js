@@ -19,29 +19,32 @@ HTMLWidgets.widget({
         p.id = paperId;
         el.appendChild(p);
 
+        if (x.border === true) {
+          p.setAttribute("style", "border:1px solid black;");
+        }
 
         // define the graph
         var graph = new joint.dia.Graph;
 
         // define the paper and assign to div element
         var paper = new joint.dia.Paper({
-        el: p,
-        width: el.offsetWidth,
-        height: el.offsetHeight,
-        model: graph,
-        gridSize: x.gridSize,
-        markAvailable: x.markAvailable,
-        restrictTranslate: x.restrictTranslate,
-        multiLinks: x.multiLinks,
-        validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
-          // Prevent linking from input ports.
-          if (magnetS && magnetS.getAttribute('type') === 'input') return false;
-          // Prevent linking from output ports to input ports within one element.
-          if (cellViewS === cellViewT) return false;
-          // Prevent linking to input ports.
-          return magnetT && magnetT.getAttribute('type') === 'input';
-        }
-    });
+          el: p,
+          width: el.offsetWidth,
+          height: el.offsetHeight,
+          model: graph,
+          gridSize: x.gridSize,
+          markAvailable: x.markAvailable,
+          restrictTranslate: x.restrictTranslate,
+          multiLinks: x.multiLinks,
+          validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+            // Prevent linking from input ports.
+            if (magnetS && magnetS.getAttribute('type') === 'input') return false;
+            // Prevent linking from output ports to input ports within one element.
+            if (cellViewS === cellViewT) return false;
+            // Prevent linking to input ports.
+            return magnetT && magnetT.getAttribute('type') === 'input';
+          }
+      });
 
     // create a couple of rectangles and join them
 /*    var rect = new joint.shapes.basic.Rect({
