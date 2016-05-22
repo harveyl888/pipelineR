@@ -8,7 +8,7 @@ server <- function(input, output) {
   })
 
   output$txtOut <- renderPrint({
-    input$jnt1_pipeline
+    do.call(rbind, input$jnt1_pipeline$pipeline)
   })
 
 }
