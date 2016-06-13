@@ -76,11 +76,13 @@ HTMLWidgets.widget({
             rect: { fill: '#2ECC71' },
             '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
             '.outPorts circle': { fill: '#E74C3C', type: 'output' }
-        }
+        },
+        prop: {nodeType: 'node 1'}
     });
 
     var m2 = m1.clone();
     m2.translate(300, 0).attr('.label/text', 'Model 2');
+    m2.prop('nodeType', 'node 2');
     graph.addCells([m1, m2]);
 
     var outputId = id + '_pipeline';
@@ -95,12 +97,17 @@ HTMLWidgets.widget({
         var link = pipelineLinks[i];
         output.pipeline.push({
           "source_id" : link.get('source').id,
+          "source_type" : 3,
+//          "source_type" : graph.getCell(link.get('source').id).attr('outPorts'),
+//          "source_type" : graph.getCell(link.get('source').id).prop('nodeType'),
           "source_port" : link.get('source').port,
           "target_id" : link.get('target').id,
+//          "target_type" : graph.getCell(link.get('target').id).prop('nodeType'),
           "target_port" : link.get('target').port
         });
       }
 
+//      var output2 = graph.getElements();
       Shiny.onInputChange(outputId, output);
     });
 
