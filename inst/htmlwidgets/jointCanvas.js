@@ -47,25 +47,6 @@ HTMLWidgets.widget({
           }
       });
 
-    // create a couple of rectangles and join them
-/*    var rect = new joint.shapes.basic.Rect({
-        position: { x: 100, y: 30 },
-        size: { width: 100, height: 30 },
-        attrs: { rect: { fill: 'blue' }, text: { text: 'my box', fill: 'white' } }
-    });
-
-    var rect2 = rect.clone();
-    rect2.translate(300);
-
-    var link = new joint.dia.Link({
-        source: { id: rect.id },
-        target: { id: rect2.id }
-    });
-
-    graph.addCells([rect, rect2, link]);
-*/
-
-
 
         var m1 = new joint.shapes.devs.Model({
         position: { x: 50, y: 50 },
@@ -73,7 +54,7 @@ HTMLWidgets.widget({
         inPorts: ['in1','in2'],
         outPorts: ['out'],
         attrs: {
-            '.label': { text: 'Model 1', 'ref-x': .4, 'ref-y': .2 },
+            '.label': { text: 'Model 1', 'ref-x': 0.4, 'ref-y': 0.2 },
             rect: { fill: '#2ECC71' },
             '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
             '.outPorts circle': { fill: '#E74C3C', type: 'output' }
@@ -99,16 +80,12 @@ HTMLWidgets.widget({
         output.pipeline.push({
           "source_id" : link.get('source').id,
           "source_type" : 3,
-//          "source_type" : graph.getCell(link.get('source').id).attr('outPorts'),
-//          "source_type" : graph.getCell(link.get('source').id).prop('nodeType'),
           "source_port" : link.get('source').port,
           "target_id" : link.get('target').id,
-//          "target_type" : graph.getCell(link.get('target').id).prop('nodeType'),
           "target_port" : link.get('target').port
         });
       }
 
-//      var output2 = graph.getElements();
       Shiny.onInputChange(outputId, output);
     });
 
