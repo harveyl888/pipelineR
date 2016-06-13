@@ -1,3 +1,7 @@
+
+// define the graph
+var graph = new joint.dia.Graph;
+
 HTMLWidgets.widget({
 
   name: 'jointCanvas',
@@ -22,9 +26,6 @@ HTMLWidgets.widget({
         if (x.border === true) {
           p.setAttribute("style", "border:1px solid black;");
         }
-
-        // define the graph
-        var graph = new joint.dia.Graph;
 
         // define the paper and assign to div element
         var paper = new joint.dia.Paper({
