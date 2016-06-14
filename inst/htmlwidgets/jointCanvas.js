@@ -2,6 +2,29 @@
 // define the graph
 var graph = new joint.dia.Graph;
 
+Shiny.addCustomMessageHandler("addEl",
+  function(data) {
+       var m1 = new joint.shapes.devs.Model({
+        position: { x: data.x, y: data.y },
+        size: { width: 90, height: 90 },
+        inPorts: ['in1','in2'],
+        outPorts: ['out'],
+        attrs: {
+            '.label': { text: data.name, 'ref-x': 0.4, 'ref-y': 0.2 },
+            rect: { fill: '#2ECC71' },
+            '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
+            '.outPorts circle': { fill: '#E74C3C', type: 'output' }
+        },
+        prop: {nodeType: 'node 1'}
+
+
+    });
+        graph.addCell(m1);
+
+    }
+);
+
+
 HTMLWidgets.widget({
 
   name: 'jointCanvas',
@@ -48,7 +71,7 @@ HTMLWidgets.widget({
       });
 
 
-        var m1 = new joint.shapes.devs.Model({
+/*        var m1 = new joint.shapes.devs.Model({
         position: { x: 50, y: 50 },
         size: { width: 90, height: 90 },
         inPorts: ['in1','in2'],
@@ -66,6 +89,8 @@ HTMLWidgets.widget({
     m2.translate(300, 0).attr('.label/text', 'Model 2');
     m2.prop('nodeType', 'node 2');
     graph.addCells([m1, m2]);
+
+*/
 
     var outputId = id + '_pipeline';
 
