@@ -2,26 +2,48 @@
 // define the graph
 var graph = new joint.dia.Graph;
 
+// Add a single node
 Shiny.addCustomMessageHandler("addEl",
   function(data) {
-       var m1 = new joint.shapes.devs.Model({
-        position: { x: data.x, y: data.y },
+    var m1 = new joint.shapes.devs.Model({
+      position: { x: data.x, y: data.y },
+      size: { width: 90, height: 90 },
+      inPorts: ['in1','in2'],
+      outPorts: ['out'],
+      attrs: {
+        '.label': { text: data.name, 'ref-x': 0.4, 'ref-y': 0.2 },
+        rect: { fill: '#2ECC71' },
+        '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
+        '.outPorts circle': { fill: '#E74C3C', type: 'output' }
+      },
+      prop: {nodeType: 'node 1'}
+    });
+    graph.addCell(m1);
+  }
+);
+
+
+// Add Multiple Nodes
+Shiny.addCustomMessageHandler("addEls",
+  function(data) {
+
+    for (var i = 0; i < data.elements.length; i++) {
+        var m1 = new joint.shapes.devs.Model({
+        position: { x: data.elements[i].x, y: data.elements[i].y },
         size: { width: 90, height: 90 },
         inPorts: ['in1','in2'],
         outPorts: ['out'],
         attrs: {
-            '.label': { text: data.name, 'ref-x': 0.4, 'ref-y': 0.2 },
-            rect: { fill: '#2ECC71' },
-            '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
-            '.outPorts circle': { fill: '#E74C3C', type: 'output' }
+          '.label': { text: data.elements[i].name, 'ref-x': 0.4, 'ref-y': 0.2 },
+          rect: { fill: '#2ECC71' },
+          '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
+          '.outPorts circle': { fill: '#E74C3C', type: 'output' }
         },
         prop: {nodeType: 'node 1'}
-
-
-    });
-        graph.addCell(m1);
-
+      });
+      graph.addCell(m1);
     }
+  }
 );
 
 

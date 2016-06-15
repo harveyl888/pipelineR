@@ -38,6 +38,10 @@ addElement <- function(x=0, y=0, id=NULL, session=shiny::getDefaultReactiveDomai
                             message = list(x = x, y = y, name=id))
 }
 
+#' @export
+addElements <- function(df=data.frame(), session=shiny::getDefaultReactiveDomain()) {
+  session$sendCustomMessage('addEls', list(elements = jsonlite::toJSON(df)))
+}
 
 
 #' Shiny bindings for jointCanvas

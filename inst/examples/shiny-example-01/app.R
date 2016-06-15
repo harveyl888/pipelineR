@@ -13,7 +13,9 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$but1, {
-    addElement(x=100, y=120, id='node', session)
+#    addElement(x=100, y=120, id='node', session)
+    df <- data.frame(name = c('node 1', 'node 2'), x = c(100, 200), y = c(100, 200))
+    addElements(df, session)
   })
 
 }
