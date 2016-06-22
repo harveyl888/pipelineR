@@ -1,3 +1,52 @@
+
+// define the graph
+var graph = new joint.dia.Graph;
+
+// Add a single node
+Shiny.addCustomMessageHandler("addEl",
+  function(data) {
+    var m1 = new joint.shapes.devs.Model({
+      position: { x: data.x, y: data.y },
+      size: { width: 90, height: 90 },
+      inPorts: ['in1','in2'],
+      outPorts: ['out'],
+      attrs: {
+        '.label': { text: data.name, 'ref-x': 0.4, 'ref-y': 0.2 },
+        rect: { fill: '#2ECC71' },
+        '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
+        '.outPorts circle': { fill: '#E74C3C', type: 'output' }
+      },
+      prop: {nodeType: 'node 1'}
+    });
+    graph.addCell(m1);
+  }
+);
+
+
+// Add Multiple Nodes
+Shiny.addCustomMessageHandler("addEls",
+  function(data) {
+
+    for (var i = 0; i < data.elements.length; i++) {
+        var m1 = new joint.shapes.devs.Model({
+        position: { x: data.elements[i].x, y: data.elements[i].y },
+        size: { width: 90, height: 90 },
+        inPorts: ['in1','in2'],
+        outPorts: ['out'],
+        attrs: {
+          '.label': { text: data.elements[i].name, 'ref-x': 0.4, 'ref-y': 0.2 },
+          rect: { fill: '#2ECC71' },
+          '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
+          '.outPorts circle': { fill: '#E74C3C', type: 'output' }
+        },
+        prop: {nodeType: 'node 1'}
+      });
+      graph.addCell(m1);
+    }
+  }
+);
+
+
 HTMLWidgets.widget({
 
   name: 'jointCanvas',
@@ -23,9 +72,6 @@ HTMLWidgets.widget({
           p.setAttribute("style", "border:1px solid black;");
         }
 
-        // define the graph
-        var graph = new joint.dia.Graph;
-
         // define the paper and assign to div element
         var paper = new joint.dia.Paper({
           el: p,
@@ -46,33 +92,14 @@ HTMLWidgets.widget({
           }
       });
 
-    // create a couple of rectangles and join them
-/*    var rect = new joint.shapes.basic.Rect({
-        position: { x: 100, y: 30 },
-        size: { width: 100, height: 30 },
-        attrs: { rect: { fill: 'blue' }, text: { text: 'my box', fill: 'white' } }
-    });
 
-    var rect2 = rect.clone();
-    rect2.translate(300);
-
-    var link = new joint.dia.Link({
-        source: { id: rect.id },
-        target: { id: rect2.id }
-    });
-
-    graph.addCells([rect, rect2, link]);
-*/
-
-
-
-        var m1 = new joint.shapes.devs.Model({
+/*        var m1 = new joint.shapes.devs.Model({
         position: { x: 50, y: 50 },
         size: { width: 90, height: 90 },
         inPorts: ['in1','in2'],
         outPorts: ['out'],
         attrs: {
-            '.label': { text: 'Model 1', 'ref-x': .4, 'ref-y': .2 },
+            '.label': { text: 'Model 1', 'ref-x': 0.4, 'ref-y': 0.2 },
             rect: { fill: '#2ECC71' },
             '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
             '.outPorts circle': { fill: '#E74C3C', type: 'output' }
@@ -84,6 +111,8 @@ HTMLWidgets.widget({
     m2.translate(300, 0).attr('.label/text', 'Model 2');
     m2.prop('nodeType', 'node 2');
     graph.addCells([m1, m2]);
+
+*/
 
     var outputId = id + '_pipeline';
 
@@ -98,16 +127,12 @@ HTMLWidgets.widget({
         output.pipeline.push({
           "source_id" : link.get('source').id,
           "source_type" : 3,
-//          "source_type" : graph.getCell(link.get('source').id).attr('outPorts'),
-//          "source_type" : graph.getCell(link.get('source').id).prop('nodeType'),
           "source_port" : link.get('source').port,
           "target_id" : link.get('target').id,
-//          "target_type" : graph.getCell(link.get('target').id).prop('nodeType'),
           "target_port" : link.get('target').port
         });
       }
 
-//      var output2 = graph.getElements();
       Shiny.onInputChange(outputId, output);
     });
 

@@ -32,6 +32,18 @@ jointCanvas <- function(gridSize = 10,
   )
 }
 
+#' @export
+addElement <- function(x=0, y=0, id=NULL, session=shiny::getDefaultReactiveDomain()) {
+  session$sendCustomMessage(type = 'addEl',
+                            message = list(x = x, y = y, name=id))
+}
+
+#' @export
+addElements <- function(df=data.frame(), session=shiny::getDefaultReactiveDomain()) {
+  session$sendCustomMessage('addEls', list(elements = jsonlite::toJSON(df)))
+}
+
+
 #' Shiny bindings for jointCanvas
 #'
 #' Output and render functions for using jointCanvas within Shiny
