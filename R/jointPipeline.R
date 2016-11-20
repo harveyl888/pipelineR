@@ -44,3 +44,10 @@ renderJointPipeline <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) { expr <- substitute(expr) } # force quoted
   htmlwidgets::shinyRenderWidget(expr, jointPipelineOutput, env, quoted = TRUE)
 }
+
+#' @export
+createNode <- function(x=0, y=0, id=NULL, session=shiny::getDefaultReactiveDomain()) {
+  session$sendCustomMessage(type = 'createNode',
+                            message = list(x = x, y = y, name=id))
+}
+
