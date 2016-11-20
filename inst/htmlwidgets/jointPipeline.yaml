@@ -8,11 +8,9 @@ dependencies:
    src: htmlwidgets/lib/backbone-1.2.1
    script: backbone.min.js
  - name: joint
-   version: 0.9.6
-   src: htmlwidgets/lib/joint-0.9.6
+   version: 1.0.2
+   src: htmlwidgets/lib/joint-1.0.2
    script: joint.min.js
-   stylesheet: joint.min.css
- - name: jointExtend
-   version: 0.1
-   src: htmlwidgets/lib/joint-0.9.6
-   stylesheet: joint_extend.css
+   stylesheet:
+     - joint.min.css
+     - joint_extend.css
