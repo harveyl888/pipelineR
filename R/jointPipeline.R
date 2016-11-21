@@ -51,3 +51,12 @@ createNode <- function(x=0, y=0, id=NULL, session=shiny::getDefaultReactiveDomai
                             message = list(x = x, y = y, name=id))
 }
 
+#' @export
+createNodes <- function(x=0, y=0, yOffset=30, id=list(), session=shiny::getDefaultReactiveDomain()) {
+  for(i in 1:length(id)) {
+    createNode(x = x, y = y + (i-1) * yOffset, id = id[[i]], session = session)
+  }
+}
+
+
+
