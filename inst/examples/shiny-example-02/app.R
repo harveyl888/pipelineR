@@ -11,11 +11,14 @@ server <- function(input, output, session) {
     jointPipeline()
   )
 
+  output$txt1 <- renderPrint({input$jnt1_selectedNode})
+
 }
 
 ui <- shinyUI(
   fluidPage(
     actionButton('but1', 'button'),
+    verbatimTextOutput('txt1'),
     jointPipelineOutput('jnt1', width=1000, height=500)
   )
 )

@@ -45,8 +45,8 @@ Shiny.addCustomMessageHandler("createNode",
           '.label': { text: data.name, 'ref-x': .5, 'ref-y': .2 },
           rect: { fill: 'LightGrey', rx: 15, ry: 15 }
       },
-      prop: {nodeType: 'node_1_type'}
     });
+    node.prop('nodeType', 'node_1_type');
     stencilGraph.addCell(node);
   }
 );
@@ -81,6 +81,8 @@ HTMLWidgets.widget({
         div_all.appendChild(div_stencil);
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
+
+        var outputSelectedNode = id + '_selectedNode';
 
         // define the paper and assign to div element
         paper = new joint.dia.Paper({
@@ -157,6 +159,11 @@ HTMLWidgets.widget({
             flyShape.remove();
             $('#flyPaper').remove();
           });
+        });
+
+        // paper events
+        paper.on('cell:pointerclick', function(cellView, evt, x, y) {
+          Shiny.onInputChange(outputSelectedNode, cellView.model.prop('nodeType'));
         });
       },
 
