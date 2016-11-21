@@ -42,11 +42,11 @@ Shiny.addCustomMessageHandler("createNode",
           }
       },
       attrs: {
-          '.label': { text: data.name, 'ref-x': .5, 'ref-y': .2 },
-          rect: { fill: 'LightGrey', rx: 15, ry: 15 }
+          rect: { fill: 'LightGrey', rx: 15, ry: 15 },
+          text: { text: data.name }
       },
     });
-    node.prop('nodeType', 'node_1_type');
+    node.prop('nodeType', data.name);
     stencilGraph.addCell(node);
   }
 );
