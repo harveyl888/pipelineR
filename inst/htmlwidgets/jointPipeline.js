@@ -82,7 +82,7 @@ HTMLWidgets.widget({
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
 
-        var outputSelectedNode = id + '_selectedNode';
+        var outputSelectedNode = id + '_selectedNode:nodeOut';
 
         // define the paper and assign to div element
         paper = new joint.dia.Paper({
@@ -163,7 +163,10 @@ HTMLWidgets.widget({
 
         // paper events
         paper.on('cell:pointerclick', function(cellView, evt, x, y) {
-          Shiny.onInputChange(outputSelectedNode, cellView.model.prop('nodeType'));
+          out = {};
+          out.id = cellView.model.id;
+          out.type = cellView.model.prop('nodeType');
+          Shiny.onInputChange(outputSelectedNode, out);
         });
       },
 
