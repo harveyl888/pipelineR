@@ -173,7 +173,7 @@ HTMLWidgets.widget({
         var outputId = id + '_graph';
 
         // update pipeline output on any event
-        graph.on('change', function(eventName, cell) {
+        graph.on('all', function(eventName, cell) {
           var pipelineLinks = graph.getLinks();
           var output = {
               pipeline: []
@@ -185,11 +185,13 @@ HTMLWidgets.widget({
               "source_id" : link.get('source').id,
               "source_type" : link.getSourceElement().prop('nodeType'),
               "source_port" : link.get('source').port,
-              "target_id" : link.get('target').id,
-              "target_type" : link.getTargetElement().prop('nodeType'),
-              "target_port" : link.get('target').port
+              // need to check for target element in case as event is fired during link creation
+              "target_id" : link.getTargetElement() === null ? '' : link.get('target').id,
+              "target_type" : link.getTargetElement() === null ? '' : link.getTargetElement().prop('nodeType'),
+              "target_port" : link.getTargetElement() === null ? '' : link.get('target').port
             });
           }
+          window.xxx = output;
           Shiny.onInputChange(outputId, output);
         });
 
