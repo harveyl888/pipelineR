@@ -14,13 +14,18 @@ server <- function(input, output, session) {
 
   output$txt1 <- renderPrint({input$jnt1_selectedNode})
 
+  output$tab1 <- renderPrint({
+    print(input$jnt1_graph)
+  })
+
 }
 
 ui <- shinyUI(
   fluidPage(
     actionButton('but1', 'button'),
     verbatimTextOutput('txt1'),
-    jointPipelineOutput('jnt1', width=1000, height=500)
+    jointPipelineOutput('jnt1', width=1000, height=500),
+    verbatimTextOutput('tab1')
   )
 )
 

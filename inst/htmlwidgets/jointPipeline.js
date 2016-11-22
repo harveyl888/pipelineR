@@ -168,6 +168,31 @@ HTMLWidgets.widget({
           out.type = cellView.model.prop('nodeType');
           Shiny.onInputChange(outputSelectedNode, out);
         });
+
+
+        var outputId = id + '_graph';
+
+        // update pipeline output on any event
+        graph.on('change', function(eventName, cell) {
+          var pipelineLinks = graph.getLinks();
+          var output = {
+              pipeline: []
+          };
+          for (var i in pipelineLinks) {
+            var link = pipelineLinks[i];
+            output.pipeline.push({
+              "id" : link.id,
+              "source_id" : link.get('source').id,
+              "source_type" : link.getSourceElement().prop('nodeType'),
+              "source_port" : link.get('source').port,
+              "target_id" : link.get('target').id,
+              "target_type" : link.getTargetElement().prop('nodeType'),
+              "target_port" : link.get('target').port
+            });
+          }
+          Shiny.onInputChange(outputId, output);
+        });
+
       },
 
       resize: function(width, height) {
