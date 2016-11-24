@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   output$txt1 <- renderPrint({input$jnt1_selectedNode})
 
   output$tab1 <- renderTable({
-    input$jnt1_graph
+    input$jnt1_links
   })
 
 }

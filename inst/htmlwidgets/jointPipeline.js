@@ -170,16 +170,32 @@ HTMLWidgets.widget({
         });
 
 
-        var outputId = id + '_graph:linksTable';
+        var outputNodes = id + '_nodes:linksTable';
+        var outputLinks = id + '_links:linksTable';
 
         // update pipeline output on any event
         graph.on('add change remove', function(eventName, cell) {
+          var pipelineNodes = graph.getElements();
+          if(pipelineNodes.length > 0) {
+            var outNodes = [];
+            for (var iNode in pipelineNodes) {
+              var node = pipelineNodes[iNode];
+              outNodes.push({
+                "id" : node.id,
+                "type" : node.prop("nodeType")
+              });
+            }
+            Shiny.onInputChange(outputNodes, outNodes);
+          } else {
+            Shiny.onInputChange(outputNodes, null);
+          }
+
           var pipelineLinks = graph.getLinks();
           if (pipelineLinks.length > 0) {
-            var output = [];
-            for (var i in pipelineLinks) {
-              var link = pipelineLinks[i];
-              output.push({
+            var outLinks = [];
+            for (var iLink in pipelineLinks) {
+              var link = pipelineLinks[iLink];
+              outLinks.push({
                 "id" : link.id,
                 "source_id" : link.get('source').id,
                 "source_type" : link.getSourceElement().prop('nodeType'),
@@ -190,9 +206,9 @@ HTMLWidgets.widget({
                 "target_port" : link.getTargetElement() === null ? '' : link.get('target').port
               });
             }
-            Shiny.onInputChange(outputId, output);
+            Shiny.onInputChange(outputLinks, outLinks);
           } else {
-            Shiny.onInputChange(outputId, null);
+            Shiny.onInputChange(outputLinks, null);
           }
         });
 
