@@ -9,8 +9,10 @@ Shiny.addCustomMessageHandler("createNode",
     var node = new joint.shapes.devs.Model({
       position: { x: data.x, y: data.y },
       size: { width: 100, height: 30 },
-      inPorts: ['in1'],
-      outPorts: ['out'],
+//      inPorts: ['in1'],
+//      outPorts: ['out'],
+        inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
+        outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
       ports: {
           groups: {
               'in': {

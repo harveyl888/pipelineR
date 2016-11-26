@@ -46,15 +46,15 @@ renderJointPipeline <- function(expr, env = parent.frame(), quoted = FALSE) {
 }
 
 #' @export
-createNode <- function(x=0, y=0, id=NULL, session=shiny::getDefaultReactiveDomain()) {
+createNode <- function(x=0, y=0, id=NULL, ports=c('in'=1,'out'=1), session=shiny::getDefaultReactiveDomain()) {
   session$sendCustomMessage(type = 'createNode',
-                            message = list(x = x, y = y, name=id))
+                            message = list(x = x, y = y, ports_in = ports[1], ports_out = ports[2], name=id))
 }
 
 #' @export
 createNodes <- function(x=0, y=0, yOffset=30, id=list(), session=shiny::getDefaultReactiveDomain()) {
   for(i in 1:length(id)) {
-    createNode(x = x, y = y + (i-1) * yOffset, id = id[[i]], session = session)
+    createNode(x = x, y = y + (i-1) * yOffset, id = id[[i]], ports=c(0,1), session = session)
   }
 }
 
