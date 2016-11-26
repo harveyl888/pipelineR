@@ -14,9 +14,9 @@ server <- function(input, output, session) {
 
   output$txt1 <- renderPrint({input$jnt1_selectedNode})
 
-  output$tab1 <- renderTable({
-    input$jnt1_links
-  })
+  output$tab1 <- renderTable({input$jnt1_links})
+
+  output$txt2 <- renderPrint({input$jnt1_dfs})
 
 }
 
@@ -25,7 +25,8 @@ ui <- shinyUI(
     actionButton('but1', 'button'),
     verbatimTextOutput('txt1'),
     jointPipelineOutput('jnt1', width=1000, height=500),
-    tableOutput('tab1')
+    tableOutput('tab1'),
+    verbatimTextOutput('txt2')
   )
 )
 

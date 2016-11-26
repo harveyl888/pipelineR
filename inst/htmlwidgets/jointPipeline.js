@@ -172,6 +172,7 @@ HTMLWidgets.widget({
 
         var outputNodes = id + '_nodes:linksTable';
         var outputLinks = id + '_links:linksTable';
+        var outputDFS = id + '_dfs';
 
         // update pipeline output on any event
         graph.on('add change remove', function(eventName, cell) {
@@ -209,6 +210,17 @@ HTMLWidgets.widget({
             Shiny.onInputChange(outputLinks, outLinks);
           } else {
             Shiny.onInputChange(outputLinks, null);
+          }
+
+          // perform dfs search and return nodes
+          // dfs search origin = lowest z value (first cell) unless initial defined
+          var origin = graph.getFirstCell();
+          if (origin === undefined) {
+            Shiny.onInputChange(outputDFS, null);
+          } else {
+            var dfs = [];
+            graph.dfs(element=origin, iteratee=function(element, distance) { dfs.push(element.id); });
+            Shiny.onInputChange(outputDFS, dfs);
           }
         });
 
