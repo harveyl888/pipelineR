@@ -25,7 +25,10 @@ server <- function(input, output, session) {
 ui <- shinyUI(
   fluidPage(
     verbatimTextOutput('txt1'),
-    jointPipelineOutput('jnt1', width=1000, height=500),
+#    jointPipelineOutput('jnt1', width=1000, height=500),
+    fluidRow(
+      column(8 ,jointPipelineOutput('jnt1', height=500))
+    ),
     tableOutput('tab1'),
     verbatimTextOutput('txt2')
   )
