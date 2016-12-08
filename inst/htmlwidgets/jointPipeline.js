@@ -85,6 +85,7 @@ HTMLWidgets.widget({
         el.appendChild(div_all);
 
         var outputSelectedNode = id + '_selectedNode:nodeOut';
+        var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
 
         // define the paper and assign to div element
         paper = new joint.dia.Paper({
@@ -156,6 +157,11 @@ HTMLWidgets.widget({
               var s = flyShape.clone();
               s.position(x - target.left - offset.x, y - target.top - offset.y);
               graph.addCell(s);
+              // update shiny variable holding node info
+              out = {};
+              out.id = s.id;
+              out.type = s.prop('nodeType');
+              Shiny.onInputChange(outputLastDroppedNode, out);
             }
             $('body').off('mousemove.fly').off('mouseup.fly');
             flyShape.remove();
