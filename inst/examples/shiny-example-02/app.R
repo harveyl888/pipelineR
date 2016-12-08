@@ -3,9 +3,7 @@ library(jointR)
 
 server <- function(input, output, session) {
 
-  observeEvent(input$but1, {
-#    createNode(x = 50, y = 50, id = 'myNode', session = session)
-#    createNodes(x = 50, y = 50, yOffset = 70, id = list('node 1', 'node 2', 'node 3'), session = session)
+  onFlushed(once = TRUE, session = session, fun = function(){
     createNode(x = 50, y = 50, id = 'initialize', ports = c(0, 1), session = session)
     createNode(x = 50, y = 120, id = 'node 1', ports = c(1, 1), session = session)
     createNode(x = 50, y = 190, id = 'node 2', ports = c(1, 1), session = session)
@@ -26,7 +24,6 @@ server <- function(input, output, session) {
 
 ui <- shinyUI(
   fluidPage(
-    actionButton('but1', 'button'),
     verbatimTextOutput('txt1'),
     jointPipelineOutput('jnt1', width=1000, height=500),
     tableOutput('tab1'),
