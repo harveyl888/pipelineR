@@ -4,10 +4,10 @@ library(jointR)
 server <- function(input, output, session) {
 
   onFlushed(once = TRUE, session = session, fun = function(){
-    createNode(x = 50, y = 50, id = 'initialize', ports = c(0, 1), session = session)
-    createNode(x = 50, y = 120, id = 'node 1', ports = c(1, 1), session = session)
-    createNode(x = 50, y = 190, id = 'node 2', ports = c(1, 1), session = session)
-    createNode(x = 50, y = 260, id = 'node 3', ports = c(1, 1), session = session)
+    createNode(x = 50, y = 50, name = 'initialize', ports = c(0, 1), session = session)
+    createNode(x = 50, y = 120, name = 'node 1', ports = c(1, 1), session = session)
+    createNode(x = 50, y = 190, name = 'node 2', ports = c(1, 1), session = session)
+    createNode(x = 50, y = 260, name = 'node 3', ports = c(1, 1), session = session)
   })
 
   output$jnt1 <- renderJointPipeline(

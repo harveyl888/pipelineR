@@ -3,14 +3,15 @@
 var graph = new joint.dia.Graph;
 var stencilGraph = new joint.dia.Graph;
 
+// node counter
+var counter = 1;
+
 // Add a single node
 Shiny.addCustomMessageHandler("createNode",
   function(data) {
     var node = new joint.shapes.devs.Model({
       position: { x: data.x, y: data.y },
       size: { width: 100, height: 30 },
-//      inPorts: ['in1'],
-//      outPorts: ['out'],
         inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
         outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
       ports: {
@@ -49,6 +50,7 @@ Shiny.addCustomMessageHandler("createNode",
       },
     });
     node.prop('nodeType', data.name);
+    node.prop('nodeName', '');
     stencilGraph.addCell(node);
   }
 );
@@ -158,11 +160,14 @@ HTMLWidgets.widget({
             if (x > target.left && x < target.left + paper.$el.width() && y > target.top && y < target.top + paper.$el.height()) {
               var s = flyShape.clone();
               s.position(x - target.left - offset.x, y - target.top - offset.y);
+              s.prop('nodeName', s.prop('nodeType') + "_" + counter);  // unique node name
+              counter ++;
               graph.addCell(s);
               // update shiny variable holding node info
               out = {};
               out.id = s.id;
               out.type = s.prop('nodeType');
+              out.name = s.prop('nodeName');
               Shiny.onInputChange(outputLastDroppedNode, out);
             }
             $('body').off('mousemove.fly').off('mouseup.fly');
@@ -176,6 +181,7 @@ HTMLWidgets.widget({
           out = {};
           out.id = cellView.model.id;
           out.type = cellView.model.prop('nodeType');
+          out.name = cellView.model.prop('nodeName');
           Shiny.onInputChange(outputSelectedNode, out);
         });
 
@@ -193,7 +199,8 @@ HTMLWidgets.widget({
               var node = pipelineNodes[iNode];
               outNodes.push({
                 "id" : node.id,
-                "type" : node.prop("nodeType")
+                "type" : node.prop("nodeType"),
+                "name" : node.prop("nodeName")
               });
             }
             Shiny.onInputChange(outputNodes, outNodes);
