@@ -90,6 +90,7 @@ HTMLWidgets.widget({
         // define the paper and assign to div element
         paper = new joint.dia.Paper({
           el: $('#' + div_paper.id),
+          height: height,
           model: graph,
           defaultLink: new joint.dia.Link({
             attrs: { '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' } }
@@ -113,6 +114,7 @@ HTMLWidgets.widget({
         // Canvas for node storage
         var stencilPaper = new joint.dia.Paper({
           el: $('#' + div_stencil.id),
+          height: height,
           model: stencilGraph,
           interactive: false
         });
