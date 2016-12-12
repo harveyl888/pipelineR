@@ -1,4 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
-inst/htmlwidgets/lib
+inst/htmlwidgets/lib/backbone-1.2.1
+inst/htmlwidgets/lib/lodash-3.10.1
+inst/htmlwidgets/lib/joint-1.0.2/joint.min.js
+inst/htmlwidgets/lib/joint-1.0.2/joint.min.css
