@@ -55,9 +55,10 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
   updateBox: function() {
       // Set the position and dimension of the box so that it covers the JointJS element.
       var bbox = this.model.getBBox();
-      // Example of updating the HTML with a data stored in the cell model.
-//      this.$box.find('label').text(this.model.get('label'));
-//      this.$box.find('span').text(this.model.get('select'));
+
+      // Define visibility of delete button
+      this.$box.find('button').toggleClass('invisible', this.model.get('hideDeleteButton'));
+
       this.$box.css({
         width: bbox.width,
         height: bbox.height,
@@ -78,6 +79,7 @@ Shiny.addCustomMessageHandler("createNode",
     var node = new joint.shapes.devs.PipelineNode({
       position: { x: data.x, y: data.y },
       size: { width: 100, height: 30 },
+      hideDeleteButton : true,
         inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
         outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
       ports: {
@@ -224,7 +226,8 @@ HTMLWidgets.widget({
 
             // Dropped over paper ?
             if (x > target.left && x < target.left + paper.$el.width() && y > target.top && y < target.top + paper.$el.height()) {
-              var s = flyShape.clone();
+              var s = flyShape.clone();  // clone the element
+              s.set('hideDeleteButton', false);  // show delete button
               s.position(x - target.left - offset.x, y - target.top - offset.y);
               s.prop('nodeName', s.prop('nodeType') + "_" + counter);  // unique node name
               counter ++;

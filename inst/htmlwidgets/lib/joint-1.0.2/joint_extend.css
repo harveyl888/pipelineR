@@ -55,15 +55,13 @@
     cursor: pointer;
 }
 
-.html-element:hover ~ button.delete {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    background-color: blue;
+
+.html-element button.invisible {
+  visibility: hidden;
 }
 
-/*.html-element button.delete:hover {
-    width: 20px;
+.html-element button.delete:hover {
+   width: 20px;
     height: 20px;
     line-height: 20px;
-}*/
+}
