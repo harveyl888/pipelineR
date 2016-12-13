@@ -6,12 +6,80 @@ var stencilGraph = new joint.dia.Graph;
 // node counter
 var counter = 1;
 
+// Define a new shape to take an html layer
+joint.shapes.devs.PipelineNode = joint.shapes.devs.Model.extend({
+  defaults: joint.util.deepSupplement({
+    type: 'devs.PipelineNode'
+  }, joint.shapes.devs.Model.prototype.defaults)
+});
+
+// Custom view
+joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
+  template: [
+    '<div class="html-element">',
+    '<button class="delete">x</button>',
+    '</div>'
+  ].join(''),
+  initialize: function() {
+    _.bindAll(this, 'updateBox');
+    joint.dia.ElementView.prototype.initialize.apply(this, arguments);
+
+    this.$box = $(_.template(this.template)());
+    // Prevent paper from handling pointerdown.
+    this.$box.find('input,select').on('mousedown click', function(evt) {
+      evt.stopPropagation();
+    });
+
+    // This is an example of reacting on the input change and storing the input data in the cell model.
+    this.$box.find('input').on('change', _.bind(function(evt) {
+      this.model.set('input', $(evt.target).val());
+    }, this));
+    this.$box.find('select').on('change', _.bind(function(evt) {
+      this.model.set('select', $(evt.target).val());
+    }, this));
+    this.$box.find('select').val(this.model.get('select'));
+    this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
+    // Update the box position whenever the underlying model changes.
+    this.model.on('change', this.updateBox, this);
+    // Remove the box when the model gets removed from the graph.
+    this.model.on('remove', this.removeBox, this);
+
+    this.updateBox();
+  },
+  render: function() {
+    joint.dia.ElementView.prototype.render.apply(this, arguments);
+    this.paper.$el.prepend(this.$box);
+    this.updateBox();
+    return this;
+  },
+  updateBox: function() {
+      // Set the position and dimension of the box so that it covers the JointJS element.
+      var bbox = this.model.getBBox();
+
+      // Define visibility of delete button
+      this.$box.find('button').toggleClass('invisible', this.model.get('hideDeleteButton'));
+
+      this.$box.css({
+        width: bbox.width,
+        height: bbox.height,
+        left: bbox.x,
+        top: bbox.y,
+        transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)'
+      });
+  },
+  removeBox: function(evt) {
+    this.$box.remove();
+  }
+});
+
+
 // Add a single node
 Shiny.addCustomMessageHandler("createNode",
   function(data) {
-    var node = new joint.shapes.devs.Model({
+    var node = new joint.shapes.devs.PipelineNode({
       position: { x: data.x, y: data.y },
       size: { width: 100, height: 30 },
+      hideDeleteButton : true,
         inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
         outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
       ports: {
@@ -158,7 +226,8 @@ HTMLWidgets.widget({
 
             // Dropped over paper ?
             if (x > target.left && x < target.left + paper.$el.width() && y > target.top && y < target.top + paper.$el.height()) {
-              var s = flyShape.clone();
+              var s = flyShape.clone();  // clone the element
+              s.set('hideDeleteButton', false);  // show delete button
               s.position(x - target.left - offset.x, y - target.top - offset.y);
               s.prop('nodeName', s.prop('nodeType') + "_" + counter);  // unique node name
               counter ++;
