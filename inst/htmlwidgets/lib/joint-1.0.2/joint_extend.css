@@ -47,16 +47,23 @@
     line-height: 15px;
     text-align: middle;
     position: absolute;
-    top: -15px;
-    left: -15px;
+    top: 7px;
+    left: 0px;
     padding: 0;
     margin: 0;
     font-weight: bold;
     cursor: pointer;
 }
 
-.html-element button.delete:hover {
+.html-element:hover ~ button.delete {
     width: 20px;
     height: 20px;
     line-height: 20px;
+    background-color: blue;
 }
+
+/*.html-element button.delete:hover {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+}*/
