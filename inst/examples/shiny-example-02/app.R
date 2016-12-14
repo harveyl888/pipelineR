@@ -14,23 +14,26 @@ server <- function(input, output, session) {
     jointPipeline()
   )
 
-  output$txt1 <- renderPrint({input$jnt1_selectedNode})
+  ## pipeline execution order
+  v <- reactiveValues(out = "")
+  observeEvent(input$but1, {
+    v$out <- pipelineDFS(jnt = 'jnt1', session = session)
+  })
+  output$txt1 <- renderPrint({ v$out })
 
+  ## table of links
   output$tab1 <- renderTable({input$jnt1_links})
-
-  output$txt2 <- renderPrint({input$jnt1_dfs})
 
 }
 
 ui <- shinyUI(
   fluidPage(
+    actionButton('but1', 'Update Order of Execution'),
     verbatimTextOutput('txt1'),
-#    jointPipelineOutput('jnt1', width=1000, height=500),
     fluidRow(
       column(8 ,jointPipelineOutput('jnt1', height=500))
     ),
-    tableOutput('tab1'),
-    verbatimTextOutput('txt2')
+    tableOutput('tab1')
   )
 )
 
