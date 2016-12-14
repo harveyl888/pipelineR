@@ -80,8 +80,10 @@ Shiny.addCustomMessageHandler("createNode",
       position: { x: data.x, y: data.y },
       size: { width: 100, height: 30 },
       hideDeleteButton : true,
-        inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
-        outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
+      inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
+      outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
+      hasInputPort : data.ports_in > 0,
+      hasOutputPort : data.ports_out > 0,
       ports: {
           groups: {
               'in': {
@@ -122,7 +124,6 @@ Shiny.addCustomMessageHandler("createNode",
     stencilGraph.addCell(node);
   }
 );
-
 
 
 HTMLWidgets.widget({
