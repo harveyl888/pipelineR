@@ -258,7 +258,7 @@ HTMLWidgets.widget({
 
         var outputNodes = id + '_nodes:linksTable';
         var outputLinks = id + '_links:linksTable';
-        var outputDFS = id + '_dfs';
+        var outputDFS = id + '_dfsRoot';
 
         // update pipeline output on any event
         graph.on('add change remove', function(eventName, cell) {

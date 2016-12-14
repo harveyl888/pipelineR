@@ -1,4 +1,4 @@
-
+#' @export
 jointPipeline <- function(
                           width = NULL,
                           height = NULL) {
@@ -58,5 +58,17 @@ createNodes <- function(x=0, y=0, yOffset=30, name=list(), session=shiny::getDef
   }
 }
 
-
-
+#' @import igraph
+#'
+#' @export
+pipelineDFS <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
+  df.links <- session$input[[paste0(jnt, '_links')]]
+  if (nrow(df.links) > 0) {
+    g <- make_directed_graph(edges = unlist(as.vector(t(df.links[, c('source_id', 'target_id')]))))
+    dfs_out <- dfs(g, root = session$input[[paste0(jnt, '_dfsRoot')]], neimode = 'in', order.out = T)
+    orderedIDs <- V(g)$name[as.numeric(dfs_out$order.out)]
+    return(orderedIDs)
+  } else {
+    return(NULL)
+  }
+}
