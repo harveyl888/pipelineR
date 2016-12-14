@@ -299,16 +299,28 @@ HTMLWidgets.widget({
             Shiny.onInputChange(outputLinks, null);
           }
 
-          // perform dfs search and return nodes
-          // dfs search origin = lowest z value (first cell) unless initial defined
-          var origin = graph.getFirstCell();
-          if (origin === undefined) {
-            Shiny.onInputChange(outputDFS, null);
+          // Return a root node for dfs search using igraph
+          // jointjs internal dfs search works well for many graphs but not
+          // those with 1->2; 3->2; 2->4 directed architecture
+          elements = graph.getElements();
+          if (elements.length === 0) {
+            dfsRootID = null;
           } else {
-            var dfs = [];
-            graph.dfs(element=origin, iteratee=function(element, distance) { dfs.push(element.id); });
-            Shiny.onInputChange(outputDFS, dfs);
+            // look for nodes without an input port
+            // get elements with no input port
+            var noInput = elements.filter(function(x) { return !x.prop('hasInputPort'); });
+            if (noInput.length > 0) {
+              // find z value and choose lowest
+              var z_noInput = noInput.map(function(x) { return x.prop('z'); });
+              var dfsRootRef = z_noInput.indexOf(Math.max.apply(Math, z_noInput));
+              // grab element id
+              dfsRootID = noInput[dfsRootRef].id;
+            } else {  // no obvious choice => take first node added
+              dfsRootID = elements[0].id;
+            }
           }
+          Shiny.onInputChange(outputDFS, dfsRootID);
+
         });
 
       },
