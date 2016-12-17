@@ -325,6 +325,12 @@ HTMLWidgets.widget({
 
       },
 
+      // expose the paper
+      myPaper: function(){
+        return paper;
+      },
+
+
       resize: function(width, height) {
 
         // TODO: code to re-render the widget with a new size
@@ -334,3 +340,18 @@ HTMLWidgets.widget({
     };
   }
 });
+
+function getPaper(id) {
+  // Get the HTMLWidgets object and return the paper
+  var htmlWidgetsObj = HTMLWidgets.find("#" + id);
+  return(htmlWidgetsObj.myPaper());
+}
+
+Shiny.addCustomMessageHandler("highlight",
+  function(data) {
+    // get the paper
+    p = getPaper(data.jnt);
+    p.findViewByModel(data.id).highlight();
+  }
+);
+

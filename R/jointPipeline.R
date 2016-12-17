@@ -72,3 +72,11 @@ pipelineDFS <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
     return(NULL)
   }
 }
+
+#' @export
+highlight <- function(jnt = NULL, id = NULL, session = shiny::getDefaultReactiveDomain()) {
+  if (is.null(jnt) | is.null(id)) return()
+  session$sendCustomMessage(type = 'highlight',
+                            message = list(jnt = jnt, id = id))
+}
+
