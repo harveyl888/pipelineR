@@ -86,10 +86,12 @@ changeStatus <- function(id = NULL, status = NULL, session = shiny::getDefaultRe
   led <- FALSE
   if (status == 'queued') {
     led <- 'yellow'
+    pulse = FALSE
   } else if (status == 'running') {
     led <- 'green'
+    pulse = TRUE
   }
   session$sendCustomMessage(type = 'changeLED',
-                            message = list(id = id, led = led))
+                            message = list(id = id, color = led, pulse = pulse))
 }
 

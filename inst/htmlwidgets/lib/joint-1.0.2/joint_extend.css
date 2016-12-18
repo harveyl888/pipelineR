@@ -64,8 +64,17 @@
   top: 7px;
   position: relative;
   border-radius: 50%;
-  background-color: #A90;
+  background-color: #FFFF00;
+  box-shadow: 0 0 10px 5px #FFFF00;
   float: right;
+}
+
+.pulsing {
+  animation: pulse 1s linear infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0; }
 }
 
 .led-green {
@@ -74,6 +83,7 @@
   top: 7px;
   position: relative;
   border-radius: 50%;
-  background-color: #690;
+  background-color: #00FF00;
+  box-shadow: 0 0 10px 5px #00FF00;
   float: right;
 }
