@@ -80,3 +80,16 @@ highlight <- function(jnt = NULL, id = NULL, session = shiny::getDefaultReactive
                             message = list(jnt = jnt, id = id))
 }
 
+#' @export
+changeStatus <- function(id = NULL, status = NULL, session = shiny::getDefaultReactiveDomain()) {
+  if (is.null(id)) return()
+  led <- FALSE
+  if (status == 'queued') {
+    led <- 'yellow'
+  } else if (status == 'running') {
+    led <- 'green'
+  }
+  session$sendCustomMessage(type = 'changeLED',
+                            message = list(id = id, led = led))
+}
+

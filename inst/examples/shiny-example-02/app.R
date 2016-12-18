@@ -18,7 +18,8 @@ server <- function(input, output, session) {
   v <- reactiveValues(out = "")
   observeEvent(input$but1, {
     v$out <- pipelineDFS(jnt = 'jnt1', session = session)
-    highlight(jnt = 'jnt1', id = v$out[1], session = session)
+#    highlight(jnt = 'jnt1', id = v$out[1], session = session)
+    changeStatus(id = v$out[1], status = 'running', session = session)
   })
   output$txt1 <- renderPrint({ v$out })
 

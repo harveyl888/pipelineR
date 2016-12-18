@@ -54,6 +54,26 @@
     cursor: pointer;
 }
 
-.html-element button.invisible {
+.invisible {
   visibility: hidden;
+}
+
+.led-yellow {
+  width: 12px;
+  height: 12px;
+  top: 7px;
+  position: relative;
+  border-radius: 50%;
+  background-color: #A90;
+  float: right;
+}
+
+.led-green {
+  width: 12px;
+  height: 12px;
+  top: 7px;
+  position: relative;
+  border-radius: 50%;
+  background-color: #690;
+  float: right;
 }

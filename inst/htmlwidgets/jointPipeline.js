@@ -18,6 +18,7 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
   template: [
     '<div class="html-element">',
     '<button class="delete">x</button>',
+    '<span class="led-yellow"</span>',
     '</div>'
   ].join(''),
   initialize: function() {
@@ -59,6 +60,13 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
       // Define visibility of delete button
       this.$box.find('button').toggleClass('invisible', this.model.get('hideDeleteButton'));
 
+      // Set color of LED
+      if (this.model.get('led') === false) {
+        this.$box.find('span').toggleClass('invisible', true);
+      } else {
+        this.$box.find('span').removeClass().addClass('led-' + this.model.get('led'));
+      }
+
       this.$box.css({
         width: bbox.width,
         height: bbox.height,
@@ -80,6 +88,7 @@ Shiny.addCustomMessageHandler("createNode",
       position: { x: data.x, y: data.y },
       size: { width: 100, height: 30 },
       hideDeleteButton : true,
+      led : false,
       inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
       outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
       hasInputPort : data.ports_in > 0,
@@ -229,6 +238,7 @@ HTMLWidgets.widget({
             if (x > target.left && x < target.left + paper.$el.width() && y > target.top && y < target.top + paper.$el.height()) {
               var s = flyShape.clone();  // clone the element
               s.set('hideDeleteButton', false);  // show delete button
+              s.set('led', 'yellow');
               s.position(x - target.left - offset.x, y - target.top - offset.y);
               s.prop('nodeName', s.prop('nodeType') + "_" + counter);  // unique node name
               counter ++;
@@ -355,3 +365,8 @@ Shiny.addCustomMessageHandler("highlight",
   }
 );
 
+Shiny.addCustomMessageHandler("changeLED",
+  function(data) {
+    graph.getCell(data.id).set('led', data.led);
+  }
+);

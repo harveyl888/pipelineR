@@ -2,6 +2,7 @@
 
 export(addElement)
 export(addElements)
+export(changeStatus)
 export(createNode)
 export(createNodes)
 export(highlight)
