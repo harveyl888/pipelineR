@@ -20,6 +20,7 @@ server <- function(input, output, session) {
     v$out <- pipelineDFS(jnt = 'jnt1', session = session)
 #    highlight(jnt = 'jnt1', id = v$out[1], session = session)
     changeStatus(id = v$out[1], status = 'running', session = session)
+    changeStatus(id = v$out[2], status = 'queued', session = session)
   })
   output$txt1 <- renderPrint({ v$out })
 
