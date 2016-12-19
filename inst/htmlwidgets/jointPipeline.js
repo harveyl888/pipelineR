@@ -18,7 +18,6 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
   template: [
     '<div class="html-element">',
     '<button class="delete">x</button>',
-//    '<span class="led-yellow"</span>',
     '</div>'
   ].join(''),
   initialize: function() {
@@ -60,14 +59,6 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
       // Define visibility of delete button
       this.$box.find('button').toggleClass('invisible', this.model.get('hideDeleteButton'));
 
-      // Set color of LED
-//      if (this.model.get('led').on === false) {
-//        this.$box.find('span').toggleClass('invisible', true);
-//      } else {
-//        this.$box.find('span').removeClass().addClass('led-' + this.model.get('led').color);
-//        if (this.model.get('led').pulse === true) this.$box.find('span').addClass('pulsing');
-//      }
-
       this.$box.css({
         width: bbox.width,
         height: bbox.height,
@@ -76,13 +67,12 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
         transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)',
         // since we'll be rounding corners for the nodes, we can round them for the html mask
         'border-radius': '15px'
-//        'border-style': 'solid',
-//        'border-width': 0
       });
 
       // remove any existing led- classes
-      var ledClasses = $(this.$box).attr('class').split(' ').filter(function(i) { return i.indexOf('led-') === 0 });
-      if (ledClasses.length > 0) this.$box.removeClass(ledClasses);
+      this.$box.removeClass(function (i, css) {
+        return(css.match (/(^|\s)led-\S+/g) || []).join(' ');
+      });
 
       // add led- class
       if (this.model.get('led').on) {
@@ -91,9 +81,6 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
 
       // add pulsing if applicable
       this.$box.toggleClass('pulsing', this.model.get('led').pulse);
-
-//      this.$box.toggleClass('led-red', true);
-//      this.$box.toggleClass('pulsing', true);
   },
   removeBox: function(evt) {
     this.$box.remove();
@@ -258,8 +245,7 @@ HTMLWidgets.widget({
             if (x > target.left && x < target.left + paper.$el.width() && y > target.top && y < target.top + paper.$el.height()) {
               var s = flyShape.clone();  // clone the element
               s.set('hideDeleteButton', false);  // show delete button
-//              s.set('led', 'yellow');
-              s.set('led', {on: false, color: "yellow", pulse: false});
+              s.set('led', {on: false, color: "yellow", pulse: false});  // ensure border led is off
               s.position(x - target.left - offset.x, y - target.top - offset.y);
               s.prop('nodeName', s.prop('nodeType') + "_" + counter);  // unique node name
               counter ++;
@@ -389,7 +375,7 @@ Shiny.addCustomMessageHandler("highlight",
 Shiny.addCustomMessageHandler("changeLED",
   function(data) {
     var led = {};
-    led.on = (data.color !== false);
+    led.on = (data.color !== 'none');
     led.color = data.color;
     led.pulse = data.pulse;
     graph.getCell(data.id).set('led', led);

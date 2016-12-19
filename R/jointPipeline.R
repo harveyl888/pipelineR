@@ -84,12 +84,21 @@ highlight <- function(jnt = NULL, id = NULL, session = shiny::getDefaultReactive
 changeStatus <- function(id = NULL, status = NULL, session = shiny::getDefaultReactiveDomain()) {
   if (is.null(id)) return()
   led <- FALSE
-  if (status == 'queued') {
+  if (status == 'none') {
+    led <- 'none'
+    pulse <- FALSE
+  } else if (status == 'queued') {
     led <- 'yellow'
-    pulse = FALSE
+    pulse <- FALSE
   } else if (status == 'running') {
     led <- 'green'
-    pulse = TRUE
+    pulse <- TRUE
+  } else if (status == 'completed') {
+    led <- 'green'
+    pulse = FALSE
+  } else if (status == 'error') {
+    led <- 'red'
+    pulse <- TRUE
   }
   session$sendCustomMessage(type = 'changeLED',
                             message = list(id = id, color = led, pulse = pulse))
