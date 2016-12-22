@@ -45,12 +45,34 @@ renderJointPipeline <- function(expr, env = parent.frame(), quoted = FALSE) {
   htmlwidgets::shinyRenderWidget(expr, jointPipelineOutput, env, quoted = TRUE)
 }
 
+#' Add a single node to stencil canvas
+#'
+#' Add one node to the stencil canvas
+#'
+#' @param x position of node in canvas (x-coordinate) defined in px
+#' @param y position of node in canvas (y-coordinate) defined in px
+#' @param name node name (displayed as a label)
+#' @param ports vector defining number of inputs (in) and outputs (out) for the node
+#' @param session Shiny session
+#'
 #' @export
 createNode <- function(x=0, y=0, name=NULL, ports=c('in'=1,'out'=1), session=shiny::getDefaultReactiveDomain()) {
   session$sendCustomMessage(type = 'createNode',
                             message = list(x = x, y = y, ports_in = ports[1], ports_out = ports[2], name = name))
 }
 
+#' Add a series of nodes to stencil canvas
+#'
+#' Add multiple nodes to the stencil canvas
+#'
+#' @param x position of first node in canvas (x-coordinate) defined in px
+#' @param y position of first node in canvas (y-coordinate) defined in px
+#' @param offset node offset in y-direction (in px).  Each node will be placed
+#' \code{offset px} below the previous one
+#' @param name list of node names (displayed as labels on the nodes)
+#' @param ports vector defining number of inputs (in) and outputs (out) for the node
+#' @param session Shiny session
+#'
 #' @export
 createNodes <- function(x=0, y=0, yOffset=30, name=list(), session=shiny::getDefaultReactiveDomain()) {
   for(i in 1:length(name)) {
@@ -58,6 +80,15 @@ createNodes <- function(x=0, y=0, yOffset=30, name=list(), session=shiny::getDef
   }
 }
 
+#' Perform a depth-first search
+#'
+#' Perform a depth-first search on a pipeline.  Initial node is determined in jointPipeline.js
+#' by identifying the first node without an input.  If all nodes have input then the first
+#' node added is used.
+#'
+#' @param jnt reference to htmlwidget
+#' @param session Shiny session
+#'
 #' @import igraph
 #'
 #' @export
@@ -73,6 +104,14 @@ pipelineDFS <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
   }
 }
 
+#' Check if pipeline is a directed acyclic graph
+#'
+#' Determine if pipeline is a directed acyclic graph.  If graph is cyclic there's a danger of
+#' getting caught in an infinite loop.
+#'
+#' @param jnt reference to htmlwidget
+#' @param session Shiny session
+#'
 #' @import igraph
 #'
 #' @export
@@ -86,6 +125,14 @@ isDAG <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
   }
 }
 
+#' Highlight a node
+#'
+#' Highlight a specific node with a box
+#'
+#' @param jnt reference to htmlwidget
+#' @param id node reference id
+#' @param session Shiny session
+#'
 #' @export
 highlight <- function(jnt = NULL, id = NULL, session = shiny::getDefaultReactiveDomain()) {
   if (is.null(jnt) | is.null(id)) return()
@@ -93,6 +140,22 @@ highlight <- function(jnt = NULL, id = NULL, session = shiny::getDefaultReactive
                             message = list(jnt = jnt, id = id))
 }
 
+#' Change node status
+#'
+#' Change the status of a node.  Status is shown by changing the border around the node.
+#' By default the node status can be one of:
+#' \itemize{
+#'   \item none - no additional highlighting
+#'   \item queued - yellow highlight
+#'   \item running - green pulsing highlight
+#'   \item completed - green highlight
+#'   \item error - red pulsing highlight
+#' }
+#'
+#' @param id node reference id
+#' @param status one of none, queued, running, completed or error
+#' @param session Shiny session
+#'
 #' @export
 changeStatus <- function(id = NULL, status = NULL, session = shiny::getDefaultReactiveDomain()) {
   if (is.null(id)) return()
