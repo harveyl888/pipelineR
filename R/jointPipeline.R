@@ -73,6 +73,19 @@ pipelineDFS <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
   }
 }
 
+#' @import igraph
+#'
+#' @export
+isDAG <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
+  df.links <- session$input[[paste0(jnt, '_links')]]
+  if (nrow(df.links) > 0) {
+    g <- make_directed_graph(edges = unlist(as.vector(t(df.links[, c('source_id', 'target_id')]))))
+    return(is_dag(g))
+  } else {
+    return(NULL)
+  }
+}
+
 #' @export
 highlight <- function(jnt = NULL, id = NULL, session = shiny::getDefaultReactiveDomain()) {
   if (is.null(jnt) | is.null(id)) return()
