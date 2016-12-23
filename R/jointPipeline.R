@@ -180,3 +180,17 @@ changeStatus <- function(id = NULL, status = NULL, session = shiny::getDefaultRe
                             message = list(id = id, color = led, pulse = pulse))
 }
 
+#' Change state of delete button
+#'
+#' Set delete button to visible or hidden
+#'
+#' @param id node reference id
+#' @param state true = visible, false = hidden
+#' @param session Shiny session
+#'
+#' @export
+deleteButton <- function(id = NULL, state = TRUE, session = shiny::getDefaultReactiveDomain()) {
+  if (is.null(id)) return()
+  session$sendCustomMessage(type = 'deleteButton',
+                            message = list(id = id, state = state))
+}

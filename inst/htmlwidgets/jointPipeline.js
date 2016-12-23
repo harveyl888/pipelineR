@@ -364,6 +364,12 @@ function getPaper(id) {
   return(htmlWidgetsObj.myPaper());
 }
 
+Shiny.addCustomMessageHandler("deleteButton",
+  function(data) {
+    graph.getCell(data.id).set('hideDeleteButton', !data.state);
+  }
+);
+
 Shiny.addCustomMessageHandler("highlight",
   function(data) {
     // get the paper
