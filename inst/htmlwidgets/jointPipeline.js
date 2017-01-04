@@ -113,11 +113,15 @@ Shiny.addCustomMessageHandler("createNode",
                     '.port-label': {
                       fill: "transparent"
                     }
+                  },
+                  label: {
+                    position: {
+                      name: 'radial'
+                    }
                   }
               },
               'out': {
                   position: "bottom",
-                  portLabelMarkup: '<text fill="yellow"/>',
                   attrs: {
                       '.port-body': {
                           r: "6",
@@ -339,6 +343,23 @@ HTMLWidgets.widget({
           Shiny.onInputChange(outputDFS, dfsRootID);
 
         });
+
+        // show input ports when starting to drag a link
+        graph.on('change:source change:target', function(link) {
+          var elements = graph.getElements();
+          elements.forEach(function(x) {
+            x.prop('ports/groups/in/attrs/.port-label/fill', 'black');
+          });
+        });
+
+        // hide input ports once link is attached
+        paper.on('link:connect', function(evt, cellView, magnet, arrowhead) {
+          var elements = graph.getElements();
+          elements.forEach(function(x) {
+            x.prop('ports/groups/in/attrs/.port-label/fill', 'transparent');
+          });
+        });
+
 
       },
 
