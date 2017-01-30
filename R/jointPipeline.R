@@ -121,7 +121,7 @@ isDAG <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
     g <- make_directed_graph(edges = unlist(as.vector(t(df.links[, c('source_id', 'target_id')]))))
     return(is_dag(g))
   } else {
-    return(NULL)
+    return(TRUE)
   }
 }
 
