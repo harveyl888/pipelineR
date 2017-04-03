@@ -1,10 +1,15 @@
-Package: jointR
-Title: What the Package Does (one line, title case)
+Package: pipelineR
+Title: Build and execute graphical pipelines
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Harvey", "Lieberman", email = "harvey.lieberman@gmail.com", role = c("aut", "cre"))
+Description: A package to facilitate the building and execution of pipeline workflows.
+    The package consists of a graphical editor and code executor.  The graphical editor
+    is built around the joint.js library and allows a user to build a workflow of connected
+    nodes contained in an external library.  Once built, the workflow can be executed with
+    output from each node available for analysis.  The purpose of this library is for
+    incorporation into a shiny app.
 Depends:
     R (>= 3.3.0)
-License: What license is it under?
+License: GPL-3
 LazyData: true
 RoxygenNote: 5.0.0
