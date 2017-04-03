@@ -12,7 +12,7 @@ jointPipeline <- function(
     x = x,
     width = width,
     height = height,
-    package = 'jointR'
+    package = 'pipelineR'
   )
 }
 
@@ -35,7 +35,7 @@ jointPipeline <- function(
 #'
 #' @export
 jointPipelineOutput <- function(outputId, width = '100%', height = '400px'){
-  htmlwidgets::shinyWidgetOutput(outputId, 'jointPipeline', width, height, package = 'jointR')
+  htmlwidgets::shinyWidgetOutput(outputId, 'jointPipeline', width, height, package = 'pipelineR')
 }
 
 #' @rdname jointPipeline-shiny
