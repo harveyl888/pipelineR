@@ -185,6 +185,8 @@ server <- function(input, output, session) {
       runNodeOrder <- pipelineDFS(jnt = 'jnt1', session = session)
       allDisplayedNodes <- runNodeOrder
 
+      print(runNodeOrder)
+
       ## hide delete buttons
       sapply(allDisplayedNodes, function(x) deleteButton(id = x, state = FALSE, session = session))
 
@@ -194,22 +196,15 @@ server <- function(input, output, session) {
         startNodeRef <- 1
       }
 
-      ## This currently works for a linear run (not in the case of more than one input to a node)
-      if (startNodeRef == 1) {
-        lastNodeOutput <- NULL  # starting from first node - no input from previous node
-      } else {
-        lastNodeOutput <- l.myNodes[[runNodeOrder[startNodeRef - 1]]]$output  # grab output from previous node
-      }
-
       value$output <- ''
 
       runNodeOrder <- runNodeOrder[startNodeRef:length(runNodeOrder)]
 
-      sapply(runNodeOrder, function(x) changeStatus(id = x, status = 'queued', session = session))
+      sapply(runNodeOrder, function(x) changeStatus(id = x$id, status = 'queued', session = session))
       for (node in runNodeOrder) {  # loop through each executable node
-        changeStatus(id = l.myNodes[[node]]$id, status = 'running', session = session)
-        type <- l.myNodes[[node]]$type
-        parameters <- l.myNodes[[node]]$parameters
+        changeStatus(id = l.myNodes[[node$id]]$id, status = 'running', session = session)
+        type <- l.myNodes[[node$id]]$type
+        parameters <- l.myNodes[[node$id]]$parameters
         l.parameters <- list()
         for (p in parameters) {  # grab the node function input names and values
           if (p$type %in% c('numeric', 'text')) {
@@ -217,23 +212,27 @@ server <- function(input, output, session) {
           } else if (p$type == 'file') {
             l.parameters <- c(l.parameters, setNames(p$value, p$name))
           } else if (p$type == 'nodeinput') {
-            l.parameters <- c(l.parameters, setNames(lastNodeOutput, p$name))
+
+            ## Add the output from the last node as an input to the current node
+            ## Currently works with single node input
+            ## Will need to modify to work in general case of n inputs based on source_id and target_port
+
+            l.parameters <- c(l.parameters, setNames(l.myNodes[[node$input$source_id]]$output, p$name))
           }
         }
         execute <- executeNode(type, l.parameters)  # execute the node
         if (execute$result == 'success') {
-          changeStatus(id = l.myNodes[[node]]$id, status = 'completed', session = session)
-          l.myNodes[[node]]$output <<- execute$output  # store the output
-          lastNodeOutput <- execute$output  # store output for input into next node
+          changeStatus(id = l.myNodes[[node$id]]$id, status = 'completed', session = session)
+          l.myNodes[[node$id]]$output <<- execute$output  # store the output
         } else {
-          changeStatus(id = l.myNodes[[node]]$id, status = 'error', session = session)
+          changeStatus(id = l.myNodes[[node$id]]$id, status = 'error', session = session)
         }
         httpuv::service()  # refresh
         if (isTRUE(session$input$pauseProcess)) {
-          if (match(node, runNodeOrder) == length(runNodeOrder)) {  ## last node
-            value$restartFrom <- node
+          if (match(node$id, runNodeOrder) == length(runNodeOrder)) {  ## last node
+            value$restartFrom <- node$id
           } else {
-            value$restartFrom <- runNodeOrder[match(node, runNodeOrder) + 1]
+            value$restartFrom <- runNodeOrder[match(node$id, runNodeOrder) + 1]
           }
           break
         }

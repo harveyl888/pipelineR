@@ -98,7 +98,16 @@ pipelineDFS <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
     g <- make_directed_graph(edges = unlist(as.vector(t(df.links[, c('source_id', 'target_id')]))))
     dfs_out <- dfs(g, root = session$input[[paste0(jnt, '_dfsRoot')]], neimode = 'in', order.out = T)
     orderedIDs <- V(g)$name[as.numeric(dfs_out$order.out)]
-    return(orderedIDs)
+
+    l.dfs <- lapply(orderedIDs, function(x) {
+      foundInputNode <- df.links[df.links$target_id == x, ]
+      if (nrow(foundInputNode) > 0) {
+        return(list(id = x, input = as.list(foundInputNode[, c("target_port", "source_id")])))
+      } else {
+        return(list(id = x, input = list()))
+      }
+    })
+    return(l.dfs)
   } else {
     return(NULL)
   }

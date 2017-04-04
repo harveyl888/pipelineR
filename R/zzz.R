@@ -10,9 +10,9 @@ pkg.env <- new.env()
   shiny::registerInputHandler('linksTable', function(data, ...) {
     if (is.null(data)) return(data.frame())
     if (.depth(data) == 1) {
-      return(as.data.frame(data))
+      return(as.data.frame(data, stringsAsFactors = FALSE))
     } else {
-      return(do.call(rbind.data.frame, data))
+      return(do.call(rbind.data.frame, c(data, stringsAsFactors = FALSE)))
     }
   }, force = TRUE)
 
