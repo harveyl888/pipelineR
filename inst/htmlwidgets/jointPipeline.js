@@ -100,10 +100,6 @@ Shiny.addCustomMessageHandler("createNode",
       outPorts: data.ports_out,
       hasInputPort : data.ports_in.length > 0,
       hasOutputPort : data.ports_out.length > 0,
-//      inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
-//      outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
-//      hasInputPort : data.ports_in > 0,
-//      hasOutputPort : data.ports_out > 0,
       ports: {
           groups: {
               'in': {

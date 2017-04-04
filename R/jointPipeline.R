@@ -114,7 +114,6 @@ pipelineDFS <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
       foundInputNode <- df.links[df.links$target_id == x, ]
       if (nrow(foundInputNode) > 0) {
         return(list(id = x, input = as.list(setNames(foundInputNode[['source_id']], foundInputNode[['target_port']]))))
-#        return(list(id = x, input = as.list(foundInputNode[, c("target_port", "source_id")])))
       } else {
         return(list(id = x, input = list()))
       }
