@@ -43,9 +43,6 @@ server <- function(input, output, session) {
       } else {
         ports_in <- list()
       }
-
-      print(ports_in)
-
       ports_out <- list('out')
       createNode(x = x, y = y, name = names(l.nodeTypes)[n], portnames = list('in'=ports_in, 'out'=ports_out), session = session)
       # ports_in <- length(which(sapply(l.nodeTypes[[n]], function(x) x['type']) == 'nodeinput'))
@@ -223,13 +220,8 @@ server <- function(input, output, session) {
             l.parameters <- c(l.parameters, setNames(p$value, p$name))
           } else if (p$type == 'file') {
             l.parameters <- c(l.parameters, setNames(p$value, p$name))
-          } else if (p$type == 'nodeinput') {
-
-            ## Add the output from the last node as an input to the current node
-            ## Currently works with single node input
-            ## Will need to modify to work in general case of n inputs based on source_id and target_port
-
-            l.parameters <- c(l.parameters, setNames(l.myNodes[[node$input$source_id]]$output, p$name))
+          } else if (p$type == 'nodeinput') {  ## output from last node pushed in as input to current node
+            l.parameters <- c(l.parameters, setNames(l.myNodes[[node$input[[p$name]]]]$output, p$name))
           }
         }
         execute <- executeNode(type, l.parameters)  # execute the node
