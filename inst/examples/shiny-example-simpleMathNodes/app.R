@@ -190,13 +190,11 @@ server <- function(input, output, session) {
       runNodeOrder <- pipelineDFS(jnt = 'jnt1', session = session)
       allDisplayedNodes <- runNodeOrder
 
-      print(runNodeOrder)
-
       ## hide delete buttons
       sapply(allDisplayedNodes, function(x) deleteButton(id = x, state = FALSE, session = session))
 
       if (!is.null(continueFrom)) {  # start from a specific node
-        startNodeRef <- match(continueFrom, runNodeOrder)
+        startNodeRef <- match(continueFrom, sapply(runNodeOrder, function(x) x$id))
       } else {
         startNodeRef <- 1
       }
@@ -229,10 +227,12 @@ server <- function(input, output, session) {
         }
         httpuv::service()  # refresh
         if (isTRUE(session$input$pauseProcess)) {
-          if (match(node$id, runNodeOrder) == length(runNodeOrder)) {  ## last node
+          if (match(node$id, sapply(runNodeOrder, function(x) x$id)) == length(runNodeOrder)) {  ## last node
+#          if (match(node$id, runNodeOrder) == length(runNodeOrder)) {  ## last node
             value$restartFrom <- node$id
           } else {
-            value$restartFrom <- runNodeOrder[match(node$id, runNodeOrder) + 1]
+#            value$restartFrom <- runNodeOrder[match(node$id, runNodeOrder) + 1]
+            value$restartFrom <- runNodeOrder[[match(node$id, sapply(runNodeOrder, function(x) x$id)) + 1]]$id
           }
           break
         }
@@ -268,14 +268,17 @@ server <- function(input, output, session) {
   resetPipeline <- function(startFrom = NULL) {
     runNodeOrder <- pipelineDFS(jnt = 'jnt1', session = session)
     if (!is.null(startFrom)) {  # start from a specific node
-      startNodeRef <- match(startFrom, runNodeOrder)
+#      startNodeRef <- match(startFrom, runNodeOrder)
+      startNodeRef <- match(startFrom, sapply(runNodeOrder, function(x) x$id))
     } else {
       startNodeRef <- 1
     }
     runNodeOrder <- runNodeOrder[startNodeRef:length(runNodeOrder)]
-    sapply(runNodeOrder, function(x) changeStatus(id = x, status = 'none', session = session))
+#    sapply(runNodeOrder, function(x) changeStatus(id = x, status = 'none', session = session))
+    sapply(runNodeOrder, function(x) changeStatus(id = x$id, status = 'none', session = session))
     for (node in runNodeOrder) {  # loop through each executable node
-      l.myNodes[[node]]$output <<- NULL
+#      l.myNodes[[node]]$output <<- NULL
+      l.myNodes[[node$id]]$output <<- NULL
     }
   }
 
