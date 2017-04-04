@@ -96,10 +96,14 @@ Shiny.addCustomMessageHandler("createNode",
       size: { width: 100, height: 30 },
       hideDeleteButton : true,
       led: { on: false, color: 'yellow', pulse: false },
-      inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
-      outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
-      hasInputPort : data.ports_in > 0,
-      hasOutputPort : data.ports_out > 0,
+      inPorts: data.ports_in,
+      outPorts: data.ports_out,
+      hasInputPort : data.ports_in.length > 0,
+      hasOutputPort : data.ports_out.length > 0,
+//      inPorts: Array.apply(null, Array(data.ports_in)).map(function (_, i) {return ('in' + (i+1));}),
+//      outPorts: Array.apply(null, Array(data.ports_out)).map(function (_, i) {return ('out' + (i+1));}),
+//      hasInputPort : data.ports_in > 0,
+//      hasOutputPort : data.ports_out > 0,
       ports: {
           groups: {
               'in': {

@@ -52,14 +52,25 @@ renderJointPipeline <- function(expr, env = parent.frame(), quoted = FALSE) {
 #' @param x position of node in canvas (x-coordinate) defined in px
 #' @param y position of node in canvas (y-coordinate) defined in px
 #' @param name node name (displayed as a label)
+#' @param portnames list optional named list of port ids.  portnames[['in']] contains a vector of input
+#'   port names and portnames[['out']] contains a vector of output port names.  If included then \code{ports}
+#'   is ignored.  If omitted then \code{ports} will be used to specify the input and output ports and
+#'   names will be automatically assigned.
 #' @param ports vector defining number of inputs (in) and outputs (out) for the node
 #' @param session Shiny session
 #'
 #' @export
-createNode <- function(x=0, y=0, name=NULL, ports=c('in'=1,'out'=1), session=shiny::getDefaultReactiveDomain()) {
+createNode <- function(x=0, y=0, name=NULL, ports=c('in'=1,'out'=1), portnames, session=shiny::getDefaultReactiveDomain()) {
+  if (missing(portnames)) {
+    portnames <- c('in' = list(paste0('in', seq(ports[1]))), 'out' = list(paste0('out', seq(ports[2]))))
+  }
   session$sendCustomMessage(type = 'createNode',
-                            message = list(x = x, y = y, ports_in = ports[1], ports_out = ports[2], name = name))
+                            message = list(x = x, y = y, ports_in = portnames[['in']], ports_out = portnames[['out']], name = name))
 }
+# createNode <- function(x=0, y=0, name=NULL, ports=c('in'=1,'out'=1), session=shiny::getDefaultReactiveDomain()) {
+#   session$sendCustomMessage(type = 'createNode',
+#                             message = list(x = x, y = y, ports_in = ports[1], ports_out = ports[2], name = name))
+# }
 
 #' Add a series of nodes to stencil canvas
 #'
