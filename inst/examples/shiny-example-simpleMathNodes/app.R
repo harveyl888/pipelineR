@@ -224,6 +224,17 @@ server <- function(input, output, session) {
           l.myNodes[[node$id]]$output <<- execute$output  # store the output
         } else {
           changeStatus(id = l.myNodes[[node$id]]$id, status = 'error', session = session)
+          showModal(modalDialog(title = 'Node Error',
+                                h4(paste0('Error in node: ', l.myNodes[[node$id]]$id)),
+                                h5(execute$output),
+                                easyClose = TRUE))
+          value$restartFrom <- node$id  ## restart from the node with error
+#          if (match(node$id, sapply(runNodeOrder, function(x) x$id)) == 1) {  ## first node
+#            value$restartFrom <- node$id
+#          } else {
+#            value$restartFrom <- runNodeOrder[[match(node$id, sapply(runNodeOrder, function(x) x$id)) - 1]]$id  ## restart from previous
+#          }
+          break
         }
         httpuv::service()  # refresh
         if (isTRUE(session$input$pauseProcess)) {

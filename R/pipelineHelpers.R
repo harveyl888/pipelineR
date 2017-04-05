@@ -79,11 +79,17 @@ executeNode <- function(fn = NULL, params = list()) {
   nodeOut <- tryCatch({
     do.call(what = fn, args = params)
   }, error = function(e) {
-    'error'
+    list(success = FALSE, message = 'error in running node') ## error caught whilst running node
+#    'error'
   })
-  if (nodeOut == 'error') {
-    return(list(result = 'error', output = 'error in running node'))
-  } else {
-    return(list(result = 'success', output = nodeOut))
+  if (!nodeOut$success) {  ## error reported by node
+    return(list(result = 'error', output = nodeOut$message))
+  } else {  ## Success !!!
+    return(list(result = 'success', output = nodeOut$output))
   }
+  # if (nodeOut == 'error') {
+  #   return(list(result = 'error', output = 'error in running node'))
+  # } else {
+  #   return(list(result = 'success', output = nodeOut))
+  # }
 }
