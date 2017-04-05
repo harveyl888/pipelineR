@@ -80,16 +80,10 @@ executeNode <- function(fn = NULL, params = list()) {
     do.call(what = fn, args = params)
   }, error = function(e) {
     list(success = FALSE, output = 'error in running node') ## error caught whilst running node
-#    'error'
   })
   if (!nodeOut$success) {
     return(list(result = 'error', output = nodeOut$output))  ## error reported by node
   } else {
     return(list(result = 'success', output = nodeOut$output))  ## Success !!!
   }
-  # if (nodeOut == 'error') {
-  #   return(list(result = 'error', output = 'error in running node'))
-  # } else {
-  #   return(list(result = 'success', output = nodeOut))
-  # }
 }
