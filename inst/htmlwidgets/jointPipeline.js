@@ -171,7 +171,15 @@ HTMLWidgets.widget({
         div_stencil.classList.add('div_stencil');
         div_paper.id = id + '-paper';
         div_paper.classList.add('div_paper');
+
+        // Create a new div to test tree view
+        var div_stencil2 = document.createElement('div');
+        div_stencil2.id = id + '-stencil2';
+        div_stencil2.classList.add('div_sten');
+        div_stencil2.innerHTML = 'Some Text';
+
         div_all.appendChild(div_stencil);
+        div_all.appendChild(div_stencil2);
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
 
