@@ -14,3 +14,8 @@ dependencies:
    stylesheet:
      - joint.min.css
      - joint_extend.css
+ - name: jsTree
+   version: 3.3.4
+   src: htmlwidgets/lib/jsTree-3.3.4
+   script: jstree.min.js
+   stylesheet: style.min.css
