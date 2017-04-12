@@ -163,58 +163,44 @@ HTMLWidgets.widget({
         // define a div to hold the widget
         // div contains left and right panes to hold nodes and construction area
         var id = el.id;
-        var div_all = document.createElement('div');
-        var div_stencil = document.createElement('div');
-        var div_paper = document.createElement('div');
+        var div_all = document.createElement('div');            // div to hold joint and tree
+        var div_stencil = document.createElement('div');        // div to hold joint stencil nodes
+        var div_paper = document.createElement('div');          // div to hold pipeline
+        var div_treecontainer = document.createElement('div');  // container div to hold tree
         div_all.id = id + '-all';
         div_stencil.id = id + '-stencil';
         div_stencil.classList.add('div_stencil');
         div_paper.id = id + '-paper';
         div_paper.classList.add('div_paper');
-
-        // Create a new div to test tree view
-        var div_stencil2 = document.createElement('div');
-        div_stencil2.id = id + '-stencil2';
-        div_stencil2.classList.add('div_sten');
+        div_treecontainer.id = id + '-treecontainer';
+        div_treecontainer.classList.add('div_treecontainer');
 
         // Add div to contain tree
-        var div_tree = document.createElement('div');
+        var div_tree = document.createElement('div');           // div to hold tree
         div_tree.id = id + '-tree';
-        div_stencil2.appendChild(div_tree);
-
+        div_treecontainer.appendChild(div_tree);
 
         div_all.appendChild(div_stencil);
         div_all.appendChild(div_stencil2);
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
 
-
-console.log(x.nodes);
-
-        // Add some dummy tree data
-
+        // Add the tree data
         var nodelist = [];
         x.nodes.forEach(function(y) {
           var dummy = {};
-          dummy.text = y.name;
+          dummy.text = y.name;  // take just the names of the nodes
           nodelist.push(dummy);
         });
 
-console.log(nodelist);
-console.log(JSON.stringify(nodelist));
-
-        $(div_tree).jstree({ 'core' : {
+        $(div_tree).jstree({ 'core' : {  // create the jsTree and populate with node names
           'data' : eval(JSON.stringify(nodelist))
           }
         });
 
-
-        //// Create a lookup array
+        // Create a lookup array - used to populate the joint node when selected off the tree
         var lookupNode = {};
         x.nodes.forEach(function(y) { lookupNode[y.name] = y });
-
-
-console.log(lookupNode);
 
         $(div_tree).on('changed.jstree', function(e, data) {
 
@@ -222,16 +208,11 @@ console.log(lookupNode);
           nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
           nodeInfo = lookupNode[nodeText];
 
-          // Create a node for the paper div
+          // Create a new joint node for drag-and-drop
           var myNode = new joint.shapes.devs.PipelineNode({
-//            position: { x: data.x, y: data.y },
             size: { width: 100, height: 30 },
             hideDeleteButton : true,
             led: { on: false, color: 'yellow', pulse: false },
-//            inPorts: data.ports_in,
-//            outPorts: data.ports_out,
-//            hasInputPort : data.ports_in.length > 0,
-//            hasOutputPort : data.ports_out.length > 0,
             inPorts: nodeInfo.ports_in,
             outPorts: nodeInfo.ports_out,
             hasInputPort : nodeInfo.ports_in.length > 0,
@@ -275,12 +256,11 @@ console.log(lookupNode);
                 text: { text: nodeInfo.name }
             },
           });
-//          node.prop('nodeType', data.name);
           myNode.prop('nodeType', nodeInfo.name);
           myNode.prop('nodeName', '');
-//          stencilGraph.addCell(node);
 
-
+        // drag and drop code taken from SO post
+        // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers
 
           $('body').append('<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;"></div>');
           var flyGraph = new joint.dia.Graph,
@@ -291,14 +271,9 @@ console.log(lookupNode);
               width: 100,
               interactive: false
             }),
-//            flyShape = cellView.model.clone(),
-flyShape = myNode,
+            flyShape = myNode,
             pos = $("#" + nodeID).offset,
             offset = {x: 0, y:0};
-////            offset = $("#" + nodeID).offset;
-//              x: x - pos.x,
-//              y: y - pos.y
-//            };
 
           flyShape.position(0, 0);
           flyGraph.addCell(flyShape);
@@ -337,10 +312,7 @@ flyShape = myNode,
             flyShape.remove();
             $('#flyPaper').remove();
           });
-
-
         });
-
 
         var outputSelectedNode = id + '_selectedNode:nodeOut';
         var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
