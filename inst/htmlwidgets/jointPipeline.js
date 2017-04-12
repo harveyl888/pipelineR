@@ -211,7 +211,10 @@ console.log(JSON.stringify(nodelist));
 
         $(div_tree).on('changed.jstree', function(e, data) {
 
-          nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of the node
+          nodeID = $(div_tree).jstree('get_selected', true)[0].id;  // selected node id
+          nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
+
+
 
           // Create a node for the paper div
           var myNode = new joint.shapes.devs.PipelineNode({
@@ -282,13 +285,12 @@ console.log(JSON.stringify(nodelist));
             }),
 //            flyShape = cellView.model.clone(),
 flyShape = myNode,
-            pos = {'x': 100, 'y': 100},
-            offset = {
-              x: 100,
-              y: 100
+            pos = $("#" + nodeID).offset,
+            offset = {x: 0, y:0};
+////            offset = $("#" + nodeID).offset;
 //              x: x - pos.x,
 //              y: y - pos.y
-            };
+//            };
 
           flyShape.position(0, 0);
           flyGraph.addCell(flyShape);
