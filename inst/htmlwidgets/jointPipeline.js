@@ -196,7 +196,7 @@ console.log(x.nodes);
         var nodelist = [];
         x.nodes.forEach(function(y) {
           var dummy = {};
-          dummy.text = y;
+          dummy.text = y.name;
           nodelist.push(dummy);
         });
 
@@ -209,12 +209,18 @@ console.log(JSON.stringify(nodelist));
         });
 
 
+        //// Create a lookup array
+        var lookupNode = {};
+        x.nodes.forEach(function(y) { lookupNode[y.name] = y });
+
+
+console.log(lookupNode);
+
         $(div_tree).on('changed.jstree', function(e, data) {
 
           nodeID = $(div_tree).jstree('get_selected', true)[0].id;  // selected node id
           nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
-
-
+          nodeInfo = lookupNode[nodeText];
 
           // Create a node for the paper div
           var myNode = new joint.shapes.devs.PipelineNode({
@@ -222,12 +228,14 @@ console.log(JSON.stringify(nodelist));
             size: { width: 100, height: 30 },
             hideDeleteButton : true,
             led: { on: false, color: 'yellow', pulse: false },
-            hasInputPort : false,
-            hasOutputPort : false,
 //            inPorts: data.ports_in,
 //            outPorts: data.ports_out,
 //            hasInputPort : data.ports_in.length > 0,
 //            hasOutputPort : data.ports_out.length > 0,
+            inPorts: nodeInfo.ports_in,
+            outPorts: nodeInfo.ports_out,
+            hasInputPort : nodeInfo.ports_in.length > 0,
+            hasOutputPort : nodeInfo.ports_out.length > 0,
             ports: {
                 groups: {
                     'in': {
@@ -264,11 +272,11 @@ console.log(JSON.stringify(nodelist));
             },
             attrs: {
                 rect: { fill: 'LightGrey', rx: 15, ry: 15 },
-                text: { text: data.name }
+                text: { text: nodeInfo.name }
             },
           });
 //          node.prop('nodeType', data.name);
-          myNode.prop('nodeType', nodeText);
+          myNode.prop('nodeType', nodeInfo.name);
           myNode.prop('nodeName', '');
 //          stencilGraph.addCell(node);
 

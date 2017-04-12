@@ -4,9 +4,31 @@ jointPipeline <- function(
                           width = NULL,
                           height = NULL) {
 
+
+  ## check node ports
+  counter <- 0
+  l.nodes <- lapply(nodes, function(x) {
+    if (is.null(x[['portnames']])) {
+      if (is.null(x[['ports']])) {
+        portnames <- c('in' = 'in1', 'out' = 'out1')  ## default = one input and one output port
+      } else {  ## no portnames - use ports to automatically assign names
+        portnames <- c('in' = list(paste0('in', seq(ports[1]))), 'out' = list(paste0('out', seq(ports[2]))))
+      }
+    } else {  ## portnames exist
+      portnames <- x[['portnames']]
+    }
+    if (is.null(x[['name']])) {  ## no name provided - assign one
+      counter <- counter + 1
+      list(name = paste0('Node_', counter), ports_in = portnames[['in']], ports_out = portnames[['out']])
+    } else {
+      list(name = x[['name']], ports_in = x[['portnames']][['in']], ports_out = x[['portnames']][['out']])
+    }
+  })
+
+
   # forward options using x
   x = list(
-    nodes = nodes
+    nodes = l.nodes
   )
 
   # create widget

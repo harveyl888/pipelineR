@@ -48,9 +48,19 @@ server <- function(input, output, session) {
   })
 
   ## Create the htmlwidget
-  output$jnt1 <- renderJointPipeline(
-    jointPipeline(nodes = names(l.nodeTypes))
-  )
+  output$jnt1 <- renderJointPipeline({
+    l.nodes <- lapply(seq_along(l.nodeTypes), function(n) {
+      input_ids <- which(sapply(l.nodeTypes[[n]], function(x) x['type'] == 'nodeinput'))
+      if (length(input_ids) > 0) {
+        ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[n]][[x]][['name']]))
+      } else {
+        ports_in <- list()
+      }
+      ports_out <- list('out')
+      list(name = names(l.nodeTypes)[n], portnames = list('in'=ports_in, 'out'=ports_out))
+    })
+    jointPipeline(nodes = l.nodes)
+  })
 
   ## Add a node to the executable list (l.myNodes).
   ## This is triggered when a node is added to the graph canvas.
