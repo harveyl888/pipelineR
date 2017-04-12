@@ -209,17 +209,126 @@ console.log(JSON.stringify(nodelist));
         });
 
 
-//        $(div_tree).jstree({ 'core' : {
-//          'data' : [
-//            { 'text' : 'Root Node 1'},
-//            { 'text' : 'Root Node 2', 'children': [ 'child 2.1', 'child 2.2'] },
-//            { 'text' : 'Root Node 3', 'children': [ 'child 3.1', 'child 3.2'] }
-//            ]
-//          }
-//        });
-
         $(div_tree).on('changed.jstree', function(e, data) {
-          alert($(div_tree).jstree('get_selected', true)[0].text);
+
+          nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of the node
+
+          // Create a node for the paper div
+          var myNode = new joint.shapes.devs.PipelineNode({
+//            position: { x: data.x, y: data.y },
+            size: { width: 100, height: 30 },
+            hideDeleteButton : true,
+            led: { on: false, color: 'yellow', pulse: false },
+            hasInputPort : false,
+            hasOutputPort : false,
+//            inPorts: data.ports_in,
+//            outPorts: data.ports_out,
+//            hasInputPort : data.ports_in.length > 0,
+//            hasOutputPort : data.ports_out.length > 0,
+            ports: {
+                groups: {
+                    'in': {
+                        position: "top",
+                        attrs: {
+                            '.port-body': {
+                                r: "6",
+                                fill: 'blue',
+                                magnet: 'passive'
+                            },
+                          '.port-label': {
+                            fill: "transparent"
+                          }
+                        },
+                        label: {
+                          position: {
+                            name: 'radial'
+                          }
+                        }
+                    },
+                    'out': {
+                        position: "bottom",
+                        attrs: {
+                            '.port-body': {
+                                r: "6",
+                                fill: 'red'
+                            },
+                            '.port-label': {
+                              fill: "transparent"
+                          }
+                        }
+                    }
+                }
+            },
+            attrs: {
+                rect: { fill: 'LightGrey', rx: 15, ry: 15 },
+                text: { text: data.name }
+            },
+          });
+//          node.prop('nodeType', data.name);
+          myNode.prop('nodeType', nodeText);
+          myNode.prop('nodeName', '');
+//          stencilGraph.addCell(node);
+
+
+
+          $('body').append('<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;"></div>');
+          var flyGraph = new joint.dia.Graph,
+            flyPaper = new joint.dia.Paper({
+              el: $('#flyPaper'),
+              model: flyGraph,
+              height: 30,
+              width: 100,
+              interactive: false
+            }),
+//            flyShape = cellView.model.clone(),
+flyShape = myNode,
+            pos = {'x': 100, 'y': 100},
+            offset = {
+              x: 100,
+              y: 100
+//              x: x - pos.x,
+//              y: y - pos.y
+            };
+
+          flyShape.position(0, 0);
+          flyGraph.addCell(flyShape);
+          $("#flyPaper").offset({
+            left: e.pageX - offset.x,
+            top: e.pageY - offset.y
+          });
+          $('body').on('mousemove.fly', function(e) {
+            $("#flyPaper").offset({
+              left: e.pageX - offset.x,
+              top: e.pageY - offset.y
+            });
+          });
+          $('body').on('mouseup.fly', function(e) {
+            var x = e.pageX,
+              y = e.pageY,
+              target = paper.$el.offset();
+
+            // Dropped over paper ?
+            if (x > target.left && x < target.left + paper.$el.width() && y > target.top && y < target.top + paper.$el.height()) {
+              var s = flyShape.clone();  // clone the element
+              s.set('hideDeleteButton', false);  // show delete button
+              s.set('led', {on: false, color: "yellow", pulse: false});  // ensure border led is off
+              s.position(x - target.left - offset.x, y - target.top - offset.y);
+              s.prop('nodeName', s.prop('nodeType') + "_" + counter);  // unique node name
+              counter ++;
+              graph.addCell(s);
+              // update shiny variable holding node info
+              out = {};
+              out.id = s.id;
+              out.type = s.prop('nodeType');
+              out.name = s.prop('nodeName');
+              Shiny.onInputChange(outputLastDroppedNode, out);
+            }
+            $('body').off('mousemove.fly').off('mouseup.fly');
+            flyShape.remove();
+            $('#flyPaper').remove();
+          });
+
+
         });
 
 
