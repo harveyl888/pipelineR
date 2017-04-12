@@ -28,7 +28,7 @@ jointPipeline <- function(
         l.child[[length(l.child) + 1]] <- list(text = node[['name']], data = c(level = 1, ports_in = list(node[['portnames']][['in']]), ports_out = list(node[['portnames']][['out']])))
       }
     }
-    l.nodes[[length(l.nodes) + 1]] <- c(text = names(nodes)[p], children = list(l.child), data = list(level = 0))
+    l.nodes[[length(l.nodes) + 1]] <- c(text = names(nodes)[p], data = list(list(level = 0)), children = list(l.child))
   }
   # counter <- 0
   # l.nodes <- lapply(nodes, function(x) {
