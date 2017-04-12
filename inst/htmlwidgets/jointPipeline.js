@@ -190,6 +190,41 @@ console.log(x.nodes);
 window.mynodes = x.nodes;
 
 
+
+
+
+
+        var outputSelectedNode = id + '_selectedNode:nodeOut';
+        var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
+
+
+
+
+        // define the paper and assign to div element
+        paper = new joint.dia.Paper({
+          el: $('#' + div_paper.id),
+          height: height,
+          model: graph,
+          defaultLink: new joint.dia.Link({
+            attrs: { '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' } }
+          }),
+          validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+            // Prevent linking from input ports.
+            if (magnetS && magnetS.getAttribute('port-group') === 'in') return false;
+            // Prevent linking from output ports to input ports within one element.
+            if (cellViewS === cellViewT) return false;
+            // Prevent linking to input ports.
+            return magnetT && magnetT.getAttribute('port-group') === 'in';
+          },
+          // Enable marking available cells & magnets
+          markAvailable: true,
+          // Enable link snapping within 75px lookup radius
+          snapLinks: { radius: 75 }
+        });
+
+
+
+
         // Add the tree data
 
 //        var nodelist = [];
@@ -226,6 +261,8 @@ window.mynodes = x.nodes;
 //          nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
 
           var selectedNode = $(div_tree).jstree('get_selected', true)[0];
+
+          if (selectedNode.data.level > 0) {
 
 
 //          nodeInfo = lookupNode[nodeText];
@@ -342,32 +379,16 @@ window.mynodes = x.nodes;
 //            flyShape.remove();
             $('#flyPaper').remove();
           });
+
+
+          }
+
+
+
         });
 
-        var outputSelectedNode = id + '_selectedNode:nodeOut';
-        var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
 
-        // define the paper and assign to div element
-        paper = new joint.dia.Paper({
-          el: $('#' + div_paper.id),
-          height: height,
-          model: graph,
-          defaultLink: new joint.dia.Link({
-            attrs: { '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' } }
-          }),
-          validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
-            // Prevent linking from input ports.
-            if (magnetS && magnetS.getAttribute('port-group') === 'in') return false;
-            // Prevent linking from output ports to input ports within one element.
-            if (cellViewS === cellViewT) return false;
-            // Prevent linking to input ports.
-            return magnetT && magnetT.getAttribute('port-group') === 'in';
-          },
-          // Enable marking available cells & magnets
-          markAvailable: true,
-          // Enable link snapping within 75px lookup radius
-          snapLinks: { radius: 75 }
-        });
+
 
         // drag and drop code taken from SO post
         // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers
@@ -442,6 +463,7 @@ window.mynodes = x.nodes;
           out = {};
           out.id = cellView.model.id;
           out.type = cellView.model.prop('nodeType');
+          out.parent = cellView.model.prop('parentID');
           out.name = cellView.model.prop('nodeName');
           Shiny.onInputChange(outputSelectedNode, out);
         });
@@ -461,6 +483,7 @@ window.mynodes = x.nodes;
               outNodes.push({
                 "id" : node.id,
                 "type" : node.prop("nodeType"),
+                "parent" : node.prop("parentID"),
                 "name" : node.prop("nodeName")
               });
             }
