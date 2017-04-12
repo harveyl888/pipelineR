@@ -176,12 +176,27 @@ HTMLWidgets.widget({
         var div_stencil2 = document.createElement('div');
         div_stencil2.id = id + '-stencil2';
         div_stencil2.classList.add('div_sten');
-        div_stencil2.innerHTML = 'Some Text';
+
+        // Add div to contain tree
+        var div_tree = document.createElement('div');
+        div_tree.id = id + '-tree';
+        div_stencil2.appendChild(div_tree);
+
 
         div_all.appendChild(div_stencil);
         div_all.appendChild(div_stencil2);
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
+
+        // Add some dummy tree data
+        $(div_tree).jstree({ 'core' : {
+          'data' : [
+            { 'text' : 'Root Node 1'},
+            { 'text' : 'Root Node 2', 'children': [ 'child 2.1', 'child 2.2'] },
+            { 'text' : 'Root Node 3', 'children': [ 'child 3.1', 'child 3.2'] }
+            ]
+          }
+        });
 
         var outputSelectedNode = id + '_selectedNode:nodeOut';
         var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
