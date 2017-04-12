@@ -222,8 +222,12 @@ window.mynodes = x.nodes;
 
         $(div_tree).on('changed.jstree', function(e, data) {
 
-          nodeID = $(div_tree).jstree('get_selected', true)[0].id;  // selected node id
-          nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
+//          nodeID = $(div_tree).jstree('get_selected', true)[0].id;  // selected node id
+//          nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
+
+          var selectedNode = $(div_tree).jstree('get_selected', true)[0];
+
+
 //          nodeInfo = lookupNode[nodeText];
 
           // Create a new joint node for drag-and-drop
@@ -231,6 +235,10 @@ window.mynodes = x.nodes;
             size: { width: 100, height: 30 },
             hideDeleteButton : true,
             led: { on: false, color: 'yellow', pulse: false },
+            inPorts: selectedNode.data.ports_in,
+            outPorts: selectedNode.data.ports_out,
+            hasInputPort : selectedNode.data.ports_in.length > 0,
+            hasOutputPort : selectedNode.data.ports_out.length > 0,
 //            inPorts: nodeInfo.ports_in,
 //            outPorts: nodeInfo.ports_out,
 //            hasInputPort : nodeInfo.ports_in.length > 0,
@@ -272,11 +280,12 @@ window.mynodes = x.nodes;
             attrs: {
                 rect: { fill: 'LightGrey', rx: 15, ry: 15 },
 //                text: { text: nodeInfo.name }
-                text: { text: 'nodeInfo.name' }
+                text: { text: selectedNode.text }
             },
           });
 //          myNode.prop('nodeType', nodeInfo.name);
-          myNode.prop('nodeType', 'nodeInfo.name');
+          myNode.prop('nodeType', selectedNode.text);
+          myNode.prop('parent', selectedNode.parent);
           myNode.prop('nodeName', '');
 
         // drag and drop code taken from SO post
@@ -292,7 +301,7 @@ window.mynodes = x.nodes;
               interactive: false
             }),
             flyShape = myNode,
-            pos = $("#" + nodeID).offset,
+            pos = $("#" + selectedNode.id).offset,
             offset = {x: 0, y:0};
 
           flyShape.position(0, 0);
@@ -329,7 +338,7 @@ window.mynodes = x.nodes;
               Shiny.onInputChange(outputLastDroppedNode, out);
             }
             $('body').off('mousemove.fly').off('mouseup.fly');
-            flyShape.remove();
+//            flyShape.remove();
             $('#flyPaper').remove();
           });
         });
@@ -417,6 +426,7 @@ window.mynodes = x.nodes;
               out = {};
               out.id = s.id;
               out.type = s.prop('nodeType');
+              out.parent = s.prop('parent');
               out.name = s.prop('nodeName');
               Shiny.onInputChange(outputLastDroppedNode, out);
             }
