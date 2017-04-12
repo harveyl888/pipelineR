@@ -198,6 +198,11 @@ HTMLWidgets.widget({
           }
         });
 
+        $(div_tree).on('changed.jstree', function(e, data) {
+          alert($(div_tree).jstree('get_selected', true)[0].text);
+        });
+
+
         var outputSelectedNode = id + '_selectedNode:nodeOut';
         var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
 
