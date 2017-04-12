@@ -188,15 +188,35 @@ HTMLWidgets.widget({
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
 
+
+console.log(x.nodes);
+
         // Add some dummy tree data
+
+        var nodelist = [];
+        x.nodes.forEach(function(y) {
+          var dummy = {};
+          dummy.text = y;
+          nodelist.push(dummy);
+        });
+
+console.log(nodelist);
+console.log(JSON.stringify(nodelist));
+
         $(div_tree).jstree({ 'core' : {
-          'data' : [
-            { 'text' : 'Root Node 1'},
-            { 'text' : 'Root Node 2', 'children': [ 'child 2.1', 'child 2.2'] },
-            { 'text' : 'Root Node 3', 'children': [ 'child 3.1', 'child 3.2'] }
-            ]
+          'data' : eval(JSON.stringify(nodelist))
           }
         });
+
+
+//        $(div_tree).jstree({ 'core' : {
+//          'data' : [
+//            { 'text' : 'Root Node 1'},
+//            { 'text' : 'Root Node 2', 'children': [ 'child 2.1', 'child 2.2'] },
+//            { 'text' : 'Root Node 3', 'children': [ 'child 3.1', 'child 3.2'] }
+//            ]
+//          }
+//        });
 
         $(div_tree).on('changed.jstree', function(e, data) {
           alert($(div_tree).jstree('get_selected', true)[0].text);

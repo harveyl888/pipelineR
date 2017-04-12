@@ -49,7 +49,7 @@ server <- function(input, output, session) {
 
   ## Create the htmlwidget
   output$jnt1 <- renderJointPipeline(
-    jointPipeline()
+    jointPipeline(nodes = names(l.nodeTypes))
   )
 
   ## Add a node to the executable list (l.myNodes).

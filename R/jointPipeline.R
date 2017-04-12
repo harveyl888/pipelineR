@@ -1,10 +1,13 @@
 #' @export
 jointPipeline <- function(
+                          nodes,
                           width = NULL,
                           height = NULL) {
 
   # forward options using x
-  x = list()
+  x = list(
+    nodes = nodes
+  )
 
   # create widget
   htmlwidgets::createWidget(
