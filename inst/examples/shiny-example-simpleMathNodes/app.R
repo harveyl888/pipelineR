@@ -33,32 +33,40 @@ server <- function(input, output, session) {
 
   ## On starting app, populate the stencil canvas with a single copy of each node
   onFlushed(once = TRUE, session = session, fun = function() {
-    lapply(seq_along(l.nodeTypes), function(n) {
-      x <- 50
-      y <- (n-1) * 70 + 50
-      input_ids <- which(sapply(l.nodeTypes[[n]], function(x) x['type'] == 'nodeinput'))
-      if (length(input_ids) > 0) {
-        ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[n]][[x]][['name']]))
-      } else {
-        ports_in <- list()
-      }
-      ports_out <- list('out')
-      createNode(x = x, y = y, name = names(l.nodeTypes)[n], portnames = list('in'=ports_in, 'out'=ports_out), session = session)
+    lapply(seq_along(l.nodeTypes), function(p) {
+      lapply(p, function(n) {
+        x <- 50
+        y <- (n-1) * 70 + 50
+        input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
+        if (length(input_ids) > 0) {
+          ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
+        } else {
+          ports_in <- list()
+        }
+        ports_out <- list('out')
+        createNode(x = x, y = y, name = names(l.nodeTypes)[[p]][[n]], portnames = list('in'=ports_in, 'out'=ports_out), session = session)
+      })
     })
   })
 
   ## Create the htmlwidget
   output$jnt1 <- renderJointPipeline({
-    l.nodes <- lapply(seq_along(l.nodeTypes), function(n) {
-      input_ids <- which(sapply(l.nodeTypes[[n]], function(x) x['type'] == 'nodeinput'))
-      if (length(input_ids) > 0) {
-        ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[n]][[x]][['name']]))
-      } else {
-        ports_in <- list()
-      }
-      ports_out <- list('out')
-      list(name = names(l.nodeTypes)[n], portnames = list('in'=ports_in, 'out'=ports_out))
+    l.nodes <- lapply(seq(l.nodeTypes), function(p) {
+      parent_name <- names(l.nodeTypes)[[p]]
+      l.parent <- lapply(seq(l.nodeTypes[[p]]), function(n) {
+        node_name <- names(l.nodeTypes[[p]])[[n]]
+        input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
+        if (length(input_ids) > 0) {
+          ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
+        } else {
+          ports_in <- list()
+        }
+        ports_out <- list('out')
+        list(name = names(l.nodeTypes[[p]])[[n]], portnames = list('in'=ports_in, 'out'=ports_out))
+      })
+      setNames(l.parent, names(l.nodeTypes[[p]]))
     })
+    l.nodes <- setNames(l.nodes, names(l.nodeTypes))
     jointPipeline(nodes = l.nodes)
   })
 

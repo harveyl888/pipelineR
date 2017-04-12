@@ -181,42 +181,60 @@ HTMLWidgets.widget({
         div_treecontainer.appendChild(div_tree);
 
         div_all.appendChild(div_stencil);
-        div_all.appendChild(div_stencil2);
+        div_all.appendChild(div_treecontainer);
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
 
+
+console.log(x.nodes);
+window.mynodes = x.nodes;
+
+
         // Add the tree data
-        var nodelist = [];
-        x.nodes.forEach(function(y) {
-          var dummy = {};
-          dummy.text = y.name;  // take just the names of the nodes
-          nodelist.push(dummy);
-        });
+
+//        var nodelist = [];
+//        parentNodes = Object.keys(x.nodes);
+//        parentNodes.forEach(function(y) {
+//          x.nodes[y].forEach(function(z) {
+//            var dummy = {};
+ //           dummy.text = y.name;  // take just the names of the nodes
+//            nodelist.push(dummy);
+ //         });
+//        });
+
+
+//        var nodelist = [];
+//        x.nodes.forEach(function(y) {
+//          var dummy = {};
+//          dummy.text = y.name;  // take just the names of the nodes
+//          nodelist.push(dummy);
+//        });
 
         $(div_tree).jstree({ 'core' : {  // create the jsTree and populate with node names
-          'data' : eval(JSON.stringify(nodelist))
+//          'data' : eval(JSON.stringify(nodelist))
+          'data' : eval(x.nodes)
           }
         });
 
         // Create a lookup array - used to populate the joint node when selected off the tree
-        var lookupNode = {};
-        x.nodes.forEach(function(y) { lookupNode[y.name] = y });
+//        var lookupNode = {};
+//        x.nodes.forEach(function(y) { lookupNode[y.name] = y });
 
         $(div_tree).on('changed.jstree', function(e, data) {
 
           nodeID = $(div_tree).jstree('get_selected', true)[0].id;  // selected node id
           nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
-          nodeInfo = lookupNode[nodeText];
+//          nodeInfo = lookupNode[nodeText];
 
           // Create a new joint node for drag-and-drop
           var myNode = new joint.shapes.devs.PipelineNode({
             size: { width: 100, height: 30 },
             hideDeleteButton : true,
             led: { on: false, color: 'yellow', pulse: false },
-            inPorts: nodeInfo.ports_in,
-            outPorts: nodeInfo.ports_out,
-            hasInputPort : nodeInfo.ports_in.length > 0,
-            hasOutputPort : nodeInfo.ports_out.length > 0,
+//            inPorts: nodeInfo.ports_in,
+//            outPorts: nodeInfo.ports_out,
+//            hasInputPort : nodeInfo.ports_in.length > 0,
+//            hasOutputPort : nodeInfo.ports_out.length > 0,
             ports: {
                 groups: {
                     'in': {
@@ -253,10 +271,12 @@ HTMLWidgets.widget({
             },
             attrs: {
                 rect: { fill: 'LightGrey', rx: 15, ry: 15 },
-                text: { text: nodeInfo.name }
+//                text: { text: nodeInfo.name }
+                text: { text: 'nodeInfo.name' }
             },
           });
-          myNode.prop('nodeType', nodeInfo.name);
+//          myNode.prop('nodeType', nodeInfo.name);
+          myNode.prop('nodeType', 'nodeInfo.name');
           myNode.prop('nodeName', '');
 
         // drag and drop code taken from SO post

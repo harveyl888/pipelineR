@@ -6,29 +6,54 @@ jointPipeline <- function(
 
 
   ## check node ports
+  l.nodes <- list()
   counter <- 0
-  l.nodes <- lapply(nodes, function(x) {
-    if (is.null(x[['portnames']])) {
-      if (is.null(x[['ports']])) {
-        portnames <- c('in' = 'in1', 'out' = 'out1')  ## default = one input and one output port
-      } else {  ## no portnames - use ports to automatically assign names
-        portnames <- c('in' = list(paste0('in', seq(ports[1]))), 'out' = list(paste0('out', seq(ports[2]))))
+  for (p in 1:length(nodes)) {  ## loop over parent
+    l.child <- list()
+    for (n in 1:length(nodes[[p]])) {  ## loop over children
+      node <- nodes[[p]][[n]]
+      if (is.null(node[['portnames']])) {
+        if (is.null(node[['ports']])) {
+          portnames <- c('in' = 'in1', 'out' = 'out1')  ## default = one input and one output port
+        } else {  ## no portnames - use ports to automatically assign names
+          portnames <- c('in' = list(paste0('in', seq(ports[1]))), 'out' = list(paste0('out', seq(ports[2]))))
+        }
+      } else {  ## portnames exist
+        portnames <- node[['portnames']]
       }
-    } else {  ## portnames exist
-      portnames <- x[['portnames']]
+      if (is.null(node[['name']])) {  ## no name provided - assign one
+        counter <- counter + 1
+        l.child[[length(l.child) + 1]] <- list(text = paste0('Node_', counter), ports_in = portnames[['in']], ports_out = portnames[['out']])
+      } else {
+        l.child[[length(l.child) + 1]] <- list(text = node[['name']], ports_in = node[['portnames']][['in']], ports_out = node[['portnames']][['out']])
+      }
     }
-    if (is.null(x[['name']])) {  ## no name provided - assign one
-      counter <- counter + 1
-      list(name = paste0('Node_', counter), ports_in = portnames[['in']], ports_out = portnames[['out']])
-    } else {
-      list(name = x[['name']], ports_in = x[['portnames']][['in']], ports_out = x[['portnames']][['out']])
-    }
-  })
-
+    l.nodes[[length(l.nodes) + 1]] <- c(text = names(nodes)[p], children = list(l.child))
+  }
+  # counter <- 0
+  # l.nodes <- lapply(nodes, function(x) {
+  #   lapply(x, function(y) {
+  #     if (is.null(y[['portnames']])) {
+  #       if (is.null(y[['ports']])) {
+  #         portnames <- c('in' = 'in1', 'out' = 'out1')  ## default = one input and one output port
+  #       } else {  ## no portnames - use ports to automatically assign names
+  #         portnames <- c('in' = list(paste0('in', seq(ports[1]))), 'out' = list(paste0('out', seq(ports[2]))))
+  #       }
+  #     } else {  ## portnames exist
+  #       portnames <- y[['portnames']]
+  #     }
+  #     if (is.null(y[['name']])) {  ## no name provided - assign one
+  #       counter <- counter + 1
+  #       list(name = paste0('Node_', counter), ports_in = portnames[['in']], ports_out = portnames[['out']])
+  #     } else {
+  #       list(name = y[['name']], ports_in = y[['portnames']][['in']], ports_out = y[['portnames']][['out']])
+  #     }
+  #   })
+  # })
 
   # forward options using x
   x = list(
-    nodes = l.nodes
+    nodes = rjson::toJSON(l.nodes)
   )
 
   # create widget
