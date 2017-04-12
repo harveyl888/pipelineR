@@ -77,7 +77,8 @@ server <- function(input, output, session) {
     l.myNodes[[n['id']]] <<- Node(id = n['id'],
                                   type = n['type'],
                                   name = n['name'],
-                                  parameters = l.nodeTypes[[n['type']]])
+##                                  parameters = l.nodeTypes[[n['type']]])
+                                  parameters = l.nodeTypes[[n['parent']]][[n['type']]])
   })
 
   ## Update node parameters

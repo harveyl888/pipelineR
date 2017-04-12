@@ -285,7 +285,7 @@ window.mynodes = x.nodes;
           });
 //          myNode.prop('nodeType', nodeInfo.name);
           myNode.prop('nodeType', selectedNode.text);
-          myNode.prop('parent', selectedNode.parent);
+          myNode.prop('parentID', $(div_tree).jstree('get_node', selectedNode.parent).text);
           myNode.prop('nodeName', '');
 
         // drag and drop code taken from SO post
@@ -334,6 +334,7 @@ window.mynodes = x.nodes;
               out = {};
               out.id = s.id;
               out.type = s.prop('nodeType');
+              out.parent = s.prop('parentID');
               out.name = s.prop('nodeName');
               Shiny.onInputChange(outputLastDroppedNode, out);
             }
@@ -426,7 +427,7 @@ window.mynodes = x.nodes;
               out = {};
               out.id = s.id;
               out.type = s.prop('nodeType');
-              out.parent = s.prop('parent');
+              out.parent = s.prop('parentID');
               out.name = s.prop('nodeName');
               Shiny.onInputChange(outputLastDroppedNode, out);
             }
