@@ -1,11 +1,11 @@
 /* Additional css for joint styling */
 
-.div_stencil {
+/*.div_stencil {
   float: left;
   width: 20%;
   height: 100%;
   background-color: #B0E0E6 !important;
-}
+}*/
 
 
 .div_treecontainer {
@@ -13,14 +13,14 @@
   float: left;
   width: 20%;
   height: 100%;
-  background-color: #FFA500 !important;
+  background-color: #B0E0E6 !important;
 }
 
 
 .div_paper {
 /*  margin-left: 40%;*/
   float: left;
-  width: 60%;
+  width: 80%;
   height: 100%;
   background-color: #FFFACD !important;
 }

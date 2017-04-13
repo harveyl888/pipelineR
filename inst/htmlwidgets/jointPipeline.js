@@ -1,7 +1,7 @@
 
 // define the graphs
 var graph = new joint.dia.Graph;
-var stencilGraph = new joint.dia.Graph;
+//var stencilGraph = new joint.dia.Graph;
 
 // node counter
 var counter = 1;
@@ -164,12 +164,12 @@ HTMLWidgets.widget({
         // div contains left and right panes to hold nodes and construction area
         var id = el.id;
         var div_all = document.createElement('div');            // div to hold joint and tree
-        var div_stencil = document.createElement('div');        // div to hold joint stencil nodes
+//        var div_stencil = document.createElement('div');        // div to hold joint stencil nodes
         var div_paper = document.createElement('div');          // div to hold pipeline
         var div_treecontainer = document.createElement('div');  // container div to hold tree
         div_all.id = id + '-all';
-        div_stencil.id = id + '-stencil';
-        div_stencil.classList.add('div_stencil');
+//        div_stencil.id = id + '-stencil';
+//        div_stencil.classList.add('div_stencil');
         div_paper.id = id + '-paper';
         div_paper.classList.add('div_paper');
         div_treecontainer.id = id + '-treecontainer';
@@ -180,7 +180,7 @@ HTMLWidgets.widget({
         div_tree.id = id + '-tree';
         div_treecontainer.appendChild(div_tree);
 
-        div_all.appendChild(div_stencil);
+//        div_all.appendChild(div_stencil);
         div_all.appendChild(div_treecontainer);
         div_all.appendChild(div_paper);
         el.appendChild(div_all);
@@ -393,15 +393,15 @@ window.mynodes = x.nodes;
         // drag and drop code taken from SO post
         // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers
         // Canvas for node storage
-        var stencilPaper = new joint.dia.Paper({
-          el: $('#' + div_stencil.id),
-          height: height,
-          model: stencilGraph,
-          interactive: false
-        });
+//        var stencilPaper = new joint.dia.Paper({
+//          el: $('#' + div_stencil.id),
+//          height: height,
+//          model: stencilGraph,
+//          interactive: false
+//        });
 
         // Events for drag and drop from first pane to second pane
-        stencilPaper.on('cell:pointerdown', function(cellView, e, x, y) {
+/*        stencilPaper.on('cell:pointerdown', function(cellView, e, x, y) {
           $('body').append('<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;"></div>');
           var flyGraph = new joint.dia.Graph,
             flyPaper = new joint.dia.Paper({
@@ -456,7 +456,7 @@ window.mynodes = x.nodes;
             flyShape.remove();
             $('#flyPaper').remove();
           });
-        });
+        });*/
 
         // paper events
         paper.on('cell:pointerclick', function(cellView, evt, x, y) {

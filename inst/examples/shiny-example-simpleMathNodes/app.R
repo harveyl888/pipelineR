@@ -1,7 +1,7 @@
 library(shiny)
 library(pipelineR)
 library(simpleMathNodes)
-
+library(cobralingusNodes)
 
 ### Example app - pipeline engine using graphical pipeline
 ###
@@ -12,7 +12,7 @@ library(simpleMathNodes)
 
 ## Define the packages containing nodes to use in this app
 ## If more than one package is used send as a vector
-nodePackages <- 'simpleMathNodes'
+nodePackages <- c('simpleMathNodes', 'cobralingusNodes')
 
 ## Add all the nodes from the packages to the internal list
 includePackages(nodePackages)
@@ -32,22 +32,22 @@ server <- function(input, output, session) {
   value <- reactiveValues(pausePipeline = FALSE)
 
   ## On starting app, populate the stencil canvas with a single copy of each node
-  onFlushed(once = TRUE, session = session, fun = function() {
-    lapply(seq_along(l.nodeTypes), function(p) {
-      lapply(p, function(n) {
-        x <- 50
-        y <- (n-1) * 70 + 50
-        input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
-        if (length(input_ids) > 0) {
-          ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
-        } else {
-          ports_in <- list()
-        }
-        ports_out <- list('out')
-        createNode(x = x, y = y, name = names(l.nodeTypes)[[p]][[n]], portnames = list('in'=ports_in, 'out'=ports_out), session = session)
-      })
-    })
-  })
+  # onFlushed(once = TRUE, session = session, fun = function() {
+  #   lapply(seq_along(l.nodeTypes), function(p) {
+  #     lapply(p, function(n) {
+  #       x <- 50
+  #       y <- (n-1) * 70 + 50
+  #       input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
+  #       if (length(input_ids) > 0) {
+  #         ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
+  #       } else {
+  #         ports_in <- list()
+  #       }
+  #       ports_out <- list('out')
+  #       createNode(x = x, y = y, name = names(l.nodeTypes)[[p]][[n]], portnames = list('in'=ports_in, 'out'=ports_out), session = session)
+  #     })
+  #   })
+  # })
 
   ## Create the htmlwidget
   output$jnt1 <- renderJointPipeline({
