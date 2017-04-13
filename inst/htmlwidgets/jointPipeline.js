@@ -191,6 +191,7 @@ HTMLWidgets.widget({
           el: $('#' + div_paper.id),
           height: height,
           model: graph,
+          linkPinning: false,
           defaultLink: new joint.dia.Link({
             attrs: { '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' } }
           }),
@@ -199,6 +200,12 @@ HTMLWidgets.widget({
             if (magnetS && magnetS.getAttribute('port-group') === 'in') return false;
             // Prevent linking from output ports to input ports within one element.
             if (cellViewS === cellViewT) return false;
+            // Prevent linking to a port that already has an input
+            var targetLinks = graph.getConnectedLinks(cellViewT.model);  // collection of links to and from the target
+            for (i = 0; i < targetLinks.length; i++) {
+              var linkTarget = targetLinks[i].get('target');
+              if(linkTarget.id == cellViewT.model.id && linkTarget.port == V(magnetT).attr('port')) return false;  // link to port on target node is already present
+            }
             // Prevent linking to input ports.
             return magnetT && magnetT.getAttribute('port-group') === 'in';
           },
