@@ -181,9 +181,9 @@ HTMLWidgets.widget({
         div_treecontainer.appendChild(div_tree);
 
 //        div_all.appendChild(div_stencil);
-        div_all.appendChild(div_treecontainer);
-        div_all.appendChild(div_paper);
-        el.appendChild(div_all);
+        el.appendChild(div_treecontainer);
+        el.appendChild(div_paper);
+//        el.appendChild(div_all);
 
 
 console.log(x.nodes);
