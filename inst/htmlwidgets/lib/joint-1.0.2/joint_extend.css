@@ -1,19 +1,11 @@
 /* Additional css for joint styling */
 
-/*.div_stencil {
-  float: left;
-  width: 20%;
-  height: 100%;
-  background-color: #B0E0E6 !important;
-}*/
-
-
 .div_treecontainer {
   position: relative;
   float: left;
   width: 20%;
   height: 100%;
-  background-color: #B0E0E6 !important;
+  background-color: #B0E0E6;
 }
 
 
