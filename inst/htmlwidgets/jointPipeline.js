@@ -1,7 +1,6 @@
 
 // define the graphs
 var graph = new joint.dia.Graph;
-//var stencilGraph = new joint.dia.Graph;
 
 // node counter
 var counter = 1;
@@ -88,7 +87,8 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
 });
 
 
-// Add a single node
+// createNode
+// Adds a single node to a jointjs graph called stencilGraph
 Shiny.addCustomMessageHandler("createNode",
   function(data) {
     var node = new joint.shapes.devs.PipelineNode({
@@ -162,16 +162,16 @@ HTMLWidgets.widget({
 
         // define a div to hold the widget
         // div contains left and right panes to hold nodes and construction area
+        // left pane = div_treecontainer, right pane = div_paper
         var id = el.id;
-        var div_all = document.createElement('div');            // div to hold joint and tree
-//        var div_stencil = document.createElement('div');        // div to hold joint stencil nodes
+
+        // Add a container for the pipeline
         var div_paper = document.createElement('div');          // div to hold pipeline
-        var div_treecontainer = document.createElement('div');  // container div to hold tree
-        div_all.id = id + '-all';
-//        div_stencil.id = id + '-stencil';
-//        div_stencil.classList.add('div_stencil');
         div_paper.id = id + '-paper';
         div_paper.classList.add('div_paper');
+
+        // Add a container for the tree
+        var div_treecontainer = document.createElement('div');  // container div to hold tree
         div_treecontainer.id = id + '-treecontainer';
         div_treecontainer.classList.add('div_treecontainer');
 
@@ -180,25 +180,11 @@ HTMLWidgets.widget({
         div_tree.id = id + '-tree';
         div_treecontainer.appendChild(div_tree);
 
-//        div_all.appendChild(div_stencil);
         el.appendChild(div_treecontainer);
         el.appendChild(div_paper);
-//        el.appendChild(div_all);
-
-
-console.log(x.nodes);
-window.mynodes = x.nodes;
-
-
-
-
-
 
         var outputSelectedNode = id + '_selectedNode:nodeOut';
         var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
-
-
-
 
         // define the paper and assign to div element
         paper = new joint.dia.Paper({
@@ -222,52 +208,20 @@ window.mynodes = x.nodes;
           snapLinks: { radius: 75 }
         });
 
-
-
-
         // Add the tree data
-
-//        var nodelist = [];
-//        parentNodes = Object.keys(x.nodes);
-//        parentNodes.forEach(function(y) {
-//          x.nodes[y].forEach(function(z) {
-//            var dummy = {};
- //           dummy.text = y.name;  // take just the names of the nodes
-//            nodelist.push(dummy);
- //         });
-//        });
-
-
-//        var nodelist = [];
-//        x.nodes.forEach(function(y) {
-//          var dummy = {};
-//          dummy.text = y.name;  // take just the names of the nodes
-//          nodelist.push(dummy);
-//        });
-
         $(div_tree).jstree({ 'core' : {  // create the jsTree and populate with node names
-//          'data' : eval(JSON.stringify(nodelist))
           'data' : eval(x.nodes)
           }
         });
 
-        // Create a lookup array - used to populate the joint node when selected off the tree
-//        var lookupNode = {};
-//        x.nodes.forEach(function(y) { lookupNode[y.name] = y });
-
+        // event = anything changed in the tree
+        // use this to pick up when a node has been selected
         $(div_tree).on('changed.jstree', function(e, data) {
-
-//          nodeID = $(div_tree).jstree('get_selected', true)[0].id;  // selected node id
-//          nodeText = $(div_tree).jstree('get_selected', true)[0].text;  // name of selected node
-
           var selectedNode = $(div_tree).jstree('get_selected', true)[0];
 
-          if (selectedNode.data.level > 0) {
+          if (selectedNode.data.level > 0) {  // Selected node is not a parent
 
-
-//          nodeInfo = lookupNode[nodeText];
-
-          // Create a new joint node for drag-and-drop
+          // Create a new joint node for dragging to paper
           var myNode = new joint.shapes.devs.PipelineNode({
             size: { width: 100, height: 30 },
             hideDeleteButton : true,
@@ -276,10 +230,6 @@ window.mynodes = x.nodes;
             outPorts: selectedNode.data.ports_out,
             hasInputPort : selectedNode.data.ports_in.length > 0,
             hasOutputPort : selectedNode.data.ports_out.length > 0,
-//            inPorts: nodeInfo.ports_in,
-//            outPorts: nodeInfo.ports_out,
-//            hasInputPort : nodeInfo.ports_in.length > 0,
-//            hasOutputPort : nodeInfo.ports_out.length > 0,
             ports: {
                 groups: {
                     'in': {
@@ -316,18 +266,15 @@ window.mynodes = x.nodes;
             },
             attrs: {
                 rect: { fill: 'LightGrey', rx: 15, ry: 15 },
-//                text: { text: nodeInfo.name }
                 text: { text: selectedNode.text }
             },
           });
-//          myNode.prop('nodeType', nodeInfo.name);
           myNode.prop('nodeType', selectedNode.text);
           myNode.prop('parentID', $(div_tree).jstree('get_node', selectedNode.parent).text);
           myNode.prop('nodeName', '');
 
         // drag and drop code taken from SO post
         // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers
-
           $('body').append('<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;"></div>');
           var flyGraph = new joint.dia.Graph,
             flyPaper = new joint.dia.Paper({
@@ -379,86 +326,11 @@ window.mynodes = x.nodes;
 //            flyShape.remove();
             $('#flyPaper').remove();
           });
-
-
           }
-
-
-
         });
 
-
-
-
-        // drag and drop code taken from SO post
-        // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers
-        // Canvas for node storage
-//        var stencilPaper = new joint.dia.Paper({
-//          el: $('#' + div_stencil.id),
-//          height: height,
-//          model: stencilGraph,
-//          interactive: false
-//        });
-
-        // Events for drag and drop from first pane to second pane
-/*        stencilPaper.on('cell:pointerdown', function(cellView, e, x, y) {
-          $('body').append('<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;"></div>');
-          var flyGraph = new joint.dia.Graph,
-            flyPaper = new joint.dia.Paper({
-              el: $('#flyPaper'),
-              model: flyGraph,
-              height: 30,
-              width: 100,
-              interactive: false
-            }),
-            flyShape = cellView.model.clone(),
-            pos = cellView.model.position(),
-            offset = {
-              x: x - pos.x,
-              y: y - pos.y
-            };
-
-          flyShape.position(0, 0);
-          flyGraph.addCell(flyShape);
-          $("#flyPaper").offset({
-            left: e.pageX - offset.x,
-            top: e.pageY - offset.y
-          });
-          $('body').on('mousemove.fly', function(e) {
-            $("#flyPaper").offset({
-              left: e.pageX - offset.x,
-              top: e.pageY - offset.y
-            });
-          });
-          $('body').on('mouseup.fly', function(e) {
-            var x = e.pageX,
-              y = e.pageY,
-              target = paper.$el.offset();
-
-            // Dropped over paper ?
-            if (x > target.left && x < target.left + paper.$el.width() && y > target.top && y < target.top + paper.$el.height()) {
-              var s = flyShape.clone();  // clone the element
-              s.set('hideDeleteButton', false);  // show delete button
-              s.set('led', {on: false, color: "yellow", pulse: false});  // ensure border led is off
-              s.position(x - target.left - offset.x, y - target.top - offset.y);
-              s.prop('nodeName', s.prop('nodeType') + "_" + counter);  // unique node name
-              counter ++;
-              graph.addCell(s);
-              // update shiny variable holding node info
-              out = {};
-              out.id = s.id;
-              out.type = s.prop('nodeType');
-              out.parent = s.prop('parentID');
-              out.name = s.prop('nodeName');
-              Shiny.onInputChange(outputLastDroppedNode, out);
-            }
-            $('body').off('mousemove.fly').off('mouseup.fly');
-            flyShape.remove();
-            $('#flyPaper').remove();
-          });
-        });*/
-
         // paper events
+        // Update selectednode when a node is selected
         paper.on('cell:pointerclick', function(cellView, evt, x, y) {
           out = {};
           out.id = cellView.model.id;
@@ -467,7 +339,6 @@ window.mynodes = x.nodes;
           out.name = cellView.model.prop('nodeName');
           Shiny.onInputChange(outputSelectedNode, out);
         });
-
 
         var outputNodes = id + '_nodes:linksTable';
         var outputLinks = id + '_links:linksTable';
@@ -552,8 +423,6 @@ window.mynodes = x.nodes;
             x.prop('ports/groups/in/attrs/.port-label/fill', 'transparent');
           });
         });
-
-
       },
 
       // expose the paper
