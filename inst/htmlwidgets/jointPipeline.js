@@ -1,7 +1,6 @@
 
 // define the graphs
 var graph = new joint.dia.Graph;
-var stencilGraph = new joint.dia.Graph;
 
 // node counter
 var counter = 1;
@@ -88,7 +87,8 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
 });
 
 
-// Add a single node
+// createNode
+// Adds a single node to a jointjs graph called stencilGraph
 Shiny.addCustomMessageHandler("createNode",
   function(data) {
     var node = new joint.shapes.devs.PipelineNode({
@@ -162,18 +162,26 @@ HTMLWidgets.widget({
 
         // define a div to hold the widget
         // div contains left and right panes to hold nodes and construction area
+        // left pane = div_treecontainer, right pane = div_paper
         var id = el.id;
-        var div_all = document.createElement('div');
-        var div_stencil = document.createElement('div');
-        var div_paper = document.createElement('div');
-        div_all.id = id + '-all';
-        div_stencil.id = id + '-stencil';
-        div_stencil.classList.add('div_stencil');
+
+        // Add a container for the pipeline
+        var div_paper = document.createElement('div');          // div to hold pipeline
         div_paper.id = id + '-paper';
         div_paper.classList.add('div_paper');
-        div_all.appendChild(div_stencil);
-        div_all.appendChild(div_paper);
-        el.appendChild(div_all);
+
+        // Add a container for the tree
+        var div_treecontainer = document.createElement('div');  // container div to hold tree
+        div_treecontainer.id = id + '-treecontainer';
+        div_treecontainer.classList.add('div_treecontainer');
+
+        // Add div to contain tree
+        var div_tree = document.createElement('div');           // div to hold tree
+        div_tree.id = id + '-tree';
+        div_treecontainer.appendChild(div_tree);
+
+        el.appendChild(div_treecontainer);
+        el.appendChild(div_paper);
 
         var outputSelectedNode = id + '_selectedNode:nodeOut';
         var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
@@ -183,6 +191,7 @@ HTMLWidgets.widget({
           el: $('#' + div_paper.id),
           height: height,
           model: graph,
+          linkPinning: false,
           defaultLink: new joint.dia.Link({
             attrs: { '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' } }
           }),
@@ -191,6 +200,12 @@ HTMLWidgets.widget({
             if (magnetS && magnetS.getAttribute('port-group') === 'in') return false;
             // Prevent linking from output ports to input ports within one element.
             if (cellViewS === cellViewT) return false;
+            // Prevent linking to a port that already has an input
+            var targetLinks = graph.getConnectedLinks(cellViewT.model);  // collection of links to and from the target
+            for (i = 0; i < targetLinks.length; i++) {
+              var linkTarget = targetLinks[i].get('target');
+              if(linkTarget.id == cellViewT.model.id && linkTarget.port == V(magnetT).attr('port')) return false;  // link to port on target node is already present
+            }
             // Prevent linking to input ports.
             return magnetT && magnetT.getAttribute('port-group') === 'in';
           },
@@ -200,18 +215,73 @@ HTMLWidgets.widget({
           snapLinks: { radius: 75 }
         });
 
-        // drag and drop code taken from SO post
-        // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers
-        // Canvas for node storage
-        var stencilPaper = new joint.dia.Paper({
-          el: $('#' + div_stencil.id),
-          height: height,
-          model: stencilGraph,
-          interactive: false
+        // Add the tree data
+        $(div_tree).jstree({ 'core' : {  // create the jsTree and populate with node names
+          'data' : eval(x.nodes)
+          }
         });
 
-        // Events for drag and drop from first pane to second pane
-        stencilPaper.on('cell:pointerdown', function(cellView, e, x, y) {
+        // event = anything changed in the tree
+        // use this to pick up when a node has been selected
+        $(div_tree).on('changed.jstree', function(e, data) {
+          var selectedNode = $(div_tree).jstree('get_selected', true)[0];
+
+          if (selectedNode.data.level > 0) {  // Selected node is not a parent
+
+          // Create a new joint node for dragging to paper
+          var myNode = new joint.shapes.devs.PipelineNode({
+            size: { width: 100, height: 30 },
+            hideDeleteButton : true,
+            led: { on: false, color: 'yellow', pulse: false },
+            inPorts: selectedNode.data.ports_in,
+            outPorts: selectedNode.data.ports_out,
+            hasInputPort : selectedNode.data.ports_in.length > 0,
+            hasOutputPort : selectedNode.data.ports_out.length > 0,
+            ports: {
+                groups: {
+                    'in': {
+                        position: "top",
+                        attrs: {
+                            '.port-body': {
+                                r: "6",
+                                fill: 'blue',
+                                magnet: 'passive'
+                            },
+                          '.port-label': {
+                            fill: "transparent"
+                          }
+                        },
+                        label: {
+                          position: {
+                            name: 'radial'
+                          }
+                        }
+                    },
+                    'out': {
+                        position: "bottom",
+                        attrs: {
+                            '.port-body': {
+                                r: "6",
+                                fill: 'red'
+                            },
+                            '.port-label': {
+                              fill: "transparent"
+                          }
+                        }
+                    }
+                }
+            },
+            attrs: {
+                rect: { fill: 'LightGrey', rx: 15, ry: 15 },
+                text: { text: selectedNode.text }
+            },
+          });
+          myNode.prop('nodeType', selectedNode.text);
+          myNode.prop('parentID', $(div_tree).jstree('get_node', selectedNode.parent).text);
+          myNode.prop('nodeName', '');
+
+        // drag and drop code taken from SO post
+        // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers
           $('body').append('<div id="flyPaper" style="position:fixed;z-index:100;opacity:.7;pointer-event:none;"></div>');
           var flyGraph = new joint.dia.Graph,
             flyPaper = new joint.dia.Paper({
@@ -221,12 +291,9 @@ HTMLWidgets.widget({
               width: 100,
               interactive: false
             }),
-            flyShape = cellView.model.clone(),
-            pos = cellView.model.position(),
-            offset = {
-              x: x - pos.x,
-              y: y - pos.y
-            };
+            flyShape = myNode,
+            pos = $("#" + selectedNode.id).offset,
+            offset = {x: 0, y:0};
 
           flyShape.position(0, 0);
           flyGraph.addCell(flyShape);
@@ -258,24 +325,27 @@ HTMLWidgets.widget({
               out = {};
               out.id = s.id;
               out.type = s.prop('nodeType');
+              out.parent = s.prop('parentID');
               out.name = s.prop('nodeName');
               Shiny.onInputChange(outputLastDroppedNode, out);
             }
             $('body').off('mousemove.fly').off('mouseup.fly');
-            flyShape.remove();
+//            flyShape.remove();
             $('#flyPaper').remove();
           });
+          }
         });
 
         // paper events
+        // Update selectednode when a node is selected
         paper.on('cell:pointerclick', function(cellView, evt, x, y) {
           out = {};
           out.id = cellView.model.id;
           out.type = cellView.model.prop('nodeType');
+          out.parent = cellView.model.prop('parentID');
           out.name = cellView.model.prop('nodeName');
           Shiny.onInputChange(outputSelectedNode, out);
         });
-
 
         var outputNodes = id + '_nodes:linksTable';
         var outputLinks = id + '_links:linksTable';
@@ -291,6 +361,7 @@ HTMLWidgets.widget({
               outNodes.push({
                 "id" : node.id,
                 "type" : node.prop("nodeType"),
+                "parent" : node.prop("parentID"),
                 "name" : node.prop("nodeName")
               });
             }
@@ -359,8 +430,6 @@ HTMLWidgets.widget({
             x.prop('ports/groups/in/attrs/.port-label/fill', 'transparent');
           });
         });
-
-
       },
 
       // expose the paper

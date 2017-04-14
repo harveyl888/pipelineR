@@ -31,7 +31,7 @@ checkfnList <- function(fn) {
 #'
 #' @export
 includePackages <- function(pkgs = NULL) {
-  out <- sapply(pkgs, function(x) try(ls(paste0('package:', x))))
+  out <- setNames(lapply(pkgs, function(x) try(ls(paste0('package:', x)))), pkgs)
   out <- out[which(!sapply(out, function(x) inherits(x, 'try-error')))]
   pkg.env$packageFunctions <- out
   pkg.env$allNodes <- unlist(out, use.names = FALSE)
@@ -46,12 +46,26 @@ includePackages <- function(pkgs = NULL) {
 #' @importFrom rjson fromJSON
 #' @export
 nodeParameters <- function() {
+
   l.nodes <- list()
-  for (n in pkg.env$allNodes) {
-    if (!is.null(comment(eval(parse(text = n))))) l.nodes[[n]] <- comment(eval(parse(text = n)))
+  for (p in seq(pkg.env$packageFunctions)) {
+    l.parents <- list()
+    for (n in pkg.env$packageFunctions[[p]]) {
+      if (!is.null(comment(eval(parse(text = n))))) {
+        l.parents[[n]] <- fromJSON(comment(eval(parse(text = n))))
+      }
+    }
+    if (length(l.parents) > 0) l.nodes[[names(pkg.env$packageFunctions)[[p]]]] <- l.parents
   }
-  return(lapply(l.nodes, fromJSON))
+  return(l.nodes)
 }
+# nodeParameters <- function() {
+#   l.nodes <- list()
+#   for (n in pkg.env$allNodes) {
+#     if (!is.null(comment(eval(parse(text = n))))) l.nodes[[n]] <- comment(eval(parse(text = n)))
+#   }
+#   return(lapply(l.nodes, fromJSON))
+# }
 
 #' Execute a node
 #'
