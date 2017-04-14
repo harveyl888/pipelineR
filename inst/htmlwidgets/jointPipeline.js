@@ -165,6 +165,11 @@ HTMLWidgets.widget({
         // left pane = div_treecontainer, right pane = div_paper
         var id = el.id;
 
+        // Add container div
+        var div_all = document.createElement('div');            // div to hold other divs
+        div_all.id = id + '-all';
+        div_all.style.height = el.style.height;
+
         // Add a container for the pipeline
         var div_paper = document.createElement('div');          // div to hold pipeline
         div_paper.id = id + '-paper';
@@ -180,8 +185,9 @@ HTMLWidgets.widget({
         div_tree.id = id + '-tree';
         div_treecontainer.appendChild(div_tree);
 
-        el.appendChild(div_treecontainer);
-        el.appendChild(div_paper);
+        div_all.appendChild(div_treecontainer);
+        div_all.appendChild(div_paper);
+        el.appendChild(div_all);
 
         var outputSelectedNode = id + '_selectedNode:nodeOut';
         var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
@@ -190,6 +196,7 @@ HTMLWidgets.widget({
         paper = new joint.dia.Paper({
           el: $('#' + div_paper.id),
           height: height,
+          width: width*0.8,
           model: graph,
           linkPinning: false,
           defaultLink: new joint.dia.Link({
@@ -212,7 +219,9 @@ HTMLWidgets.widget({
           // Enable marking available cells & magnets
           markAvailable: true,
           // Enable link snapping within 75px lookup radius
-          snapLinks: { radius: 75 }
+          snapLinks: { radius: 75 },
+          // Limit movement to inside paper
+          restrictTranslate : true
         });
 
         // Add the tree data
