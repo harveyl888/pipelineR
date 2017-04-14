@@ -1,7 +1,6 @@
 library(shiny)
 library(pipelineR)
 library(simpleMathNodes)
-library(cobralingusNodes)
 
 ### Example app - pipeline engine using graphical pipeline
 ###
@@ -12,7 +11,7 @@ library(cobralingusNodes)
 
 ## Define the packages containing nodes to use in this app
 ## If more than one package is used send as a vector
-nodePackages <- c('simpleMathNodes', 'cobralingusNodes')
+nodePackages <- 'simpleMathNodes'
 
 ## Add all the nodes from the packages to the internal list
 includePackages(nodePackages)
