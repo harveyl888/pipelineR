@@ -221,7 +221,7 @@ HTMLWidgets.widget({
           // Enable link snapping within 75px lookup radius
           snapLinks: { radius: 75 },
           // Limit movement to inside paper
-          restrictTranslate : true
+//          restrictTranslate : true
         });
 
         // Add the tree data
@@ -422,6 +422,10 @@ HTMLWidgets.widget({
           }
           Shiny.onInputChange(outputDFS, dfsRootID);
 
+        });
+
+        graph.on('change:position', function() {
+          paper.fitToContent();
         });
 
         // show input ports when starting to drag a link
