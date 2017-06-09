@@ -340,6 +340,7 @@ ui <- shinyUI(
   fluidPage(
     tags$head(tags$script(src="buttons.js")),
     br(),
+    HTML("<i class = 'fa fa-address-book-o'></i>"),
     fluidRow(
       column(8,
              jointPipelineOutput('jnt1', height='600px')
