@@ -15,9 +15,12 @@ joint.shapes.devs.PipelineNode = joint.shapes.devs.Model.extend({
 // Custom view
 joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
   template: [
+//    '<div class="html-element">',
+//    '<button class="delete">x</button>',
+//    '</div>'
     '<div class="html-element">',
     '<button class="delete">x</button>',
-    '<div style="text-align: center; vertical-align: middle"><i class = "fa fa-address-book fa-2x"></i></div>',
+    '<div style="text-align: center; line-height:30px"><i class = "fa fa-address-book fa-lg"></i></div>',
     '</div>'
   ].join(''),
   initialize: function() {
@@ -240,7 +243,8 @@ HTMLWidgets.widget({
 
           // Create a new joint node for dragging to paper
           var myNode = new joint.shapes.devs.PipelineNode({
-            size: { width: 100, height: 30 },
+            size: { width: 50, height: 30 },
+//            size: { width: 100, height: 30 },
             hideDeleteButton : true,
             led: { on: false, color: 'yellow', pulse: false },
             inPorts: selectedNode.data.ports_in,
@@ -283,7 +287,8 @@ HTMLWidgets.widget({
             },
             attrs: {
                 rect: { fill: 'LightGrey', rx: 15, ry: 15 },
-                text: { text: selectedNode.text }
+//                text: { text: selectedNode.text }
+                text: { text: '' }
             },
           });
           myNode.prop('nodeType', selectedNode.text);
