@@ -17,6 +17,7 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
   template: [
     '<div class="html-element">',
     '<button class="delete">x</button>',
+    '<div style="text-align: center; vertical-align: middle"><i class = "fa fa-address-book fa-2x"></i></div>',
     '</div>'
   ].join(''),
   initialize: function() {
