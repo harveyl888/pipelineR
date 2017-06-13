@@ -122,7 +122,9 @@ joint.shapes.devs.PipelineNodeIconView = joint.dia.ElementView.extend({
       var bbox = this.model.getBBox();
 
       // Update the icon
-      this.$box.find($(".fa")).removeClass('fa-play').addClass('fa-' + this.model.get('icon'));
+      if (this.model.get('icon') !== undefined) {
+        this.$box.find($(".fa")).removeClass('fa-play').addClass('fa-' + this.model.get('icon'));
+      }
 
       // Define visibility of delete button
       this.$box.find('button').toggleClass('invisible', this.model.get('hideDeleteButton'));
@@ -318,7 +320,7 @@ HTMLWidgets.widget({
             size: { width: 50, height: 30 },
 //            size: { width: 100, height: 30 },
             hideDeleteButton : true,
-            icon: 'circle',
+//            icon: 'expand',
             led: { on: false, color: 'yellow', pulse: false },
             inPorts: selectedNode.data.ports_in,
             outPorts: selectedNode.data.ports_out,
