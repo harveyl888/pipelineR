@@ -32,15 +32,6 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
     this.$box.find('input,select').on('mousedown click', function(evt) {
       evt.stopPropagation();
     });
-
-    // This is an example of reacting on the input change and storing the input data in the cell model.
-    this.$box.find('input').on('change', _.bind(function(evt) {
-      this.model.set('input', $(evt.target).val());
-    }, this));
-    this.$box.find('select').on('change', _.bind(function(evt) {
-      this.model.set('select', $(evt.target).val());
-    }, this));
-    this.$box.find('select').val(this.model.get('select'));
     this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
     // Update the box position whenever the underlying model changes.
     this.model.on('change', this.updateBox, this);
