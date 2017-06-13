@@ -5,7 +5,7 @@ var graph = new joint.dia.Graph;
 // node counter
 var counter = 1;
 
-// Define a new shape to take an html layer
+// Define a new shape to take an html layer - node with label
 joint.shapes.devs.PipelineNode = joint.shapes.devs.Model.extend({
   defaults: joint.util.deepSupplement({
     type: 'devs.PipelineNode'
@@ -15,9 +15,78 @@ joint.shapes.devs.PipelineNode = joint.shapes.devs.Model.extend({
 // Custom view
 joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
   template: [
-//    '<div class="html-element">',
-//    '<button class="delete">x</button>',
-//    '</div>'
+    '<div class="html-element">',
+    '<button class="delete">x</button>',
+    '</div>'
+  ].join(''),
+  initialize: function() {
+    _.bindAll(this, 'updateBox');
+    joint.dia.ElementView.prototype.initialize.apply(this, arguments);
+
+    this.$box = $(_.template(this.template)());
+    // Prevent paper from handling pointerdown.
+    this.$box.find('input,select').on('mousedown click', function(evt) {
+      evt.stopPropagation();
+    });
+    this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
+    // Update the box position whenever the underlying model changes.
+    this.model.on('change', this.updateBox, this);
+    // Remove the box when the model gets removed from the graph.
+    this.model.on('remove', this.removeBox, this);
+
+    this.updateBox();
+  },
+  render: function() {
+    joint.dia.ElementView.prototype.render.apply(this, arguments);
+    this.paper.$el.prepend(this.$box);
+    this.updateBox();
+    return this;
+  },
+  updateBox: function() {
+      // Set the position and dimension of the box so that it covers the JointJS element.
+      var bbox = this.model.getBBox();
+
+      // Define visibility of delete button
+      this.$box.find('button').toggleClass('invisible', this.model.get('hideDeleteButton'));
+
+      this.$box.css({
+        width: bbox.width,
+        height: bbox.height,
+        left: bbox.x,
+        top: bbox.y,
+        transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)',
+        // since we'll be rounding corners for the nodes, we can round them for the html mask
+        'border-radius': '15px'
+      });
+
+      // remove any existing led- classes
+      this.$box.removeClass(function (i, css) {
+        return(css.match (/(^|\s)led-\S+/g) || []).join(' ');
+      });
+
+      // add led- class
+      if (this.model.get('led').on) {
+        this.$box.addClass('led-' + this.model.get('led').color);
+      }
+
+      // add pulsing if applicable
+      this.$box.toggleClass('pulsing', this.model.get('led').pulse);
+  },
+  removeBox: function(evt) {
+    this.$box.remove();
+  }
+});
+
+// Define a new shape to take an html layer - node with icon
+joint.shapes.devs.PipelineNodeIcon = joint.shapes.devs.Model.extend({
+  defaults: joint.util.deepSupplement({
+    type: 'devs.PipelineNodeIcon'
+  }, joint.shapes.devs.Model.prototype.defaults)
+});
+
+// Custom view
+joint.shapes.devs.PipelineNodeIconView = joint.dia.ElementView.extend({
+  template: [
     '<div class="html-element">',
     '<button class="delete">x</button>',
     '<div style="text-align: center; line-height:30px"><i class = "fa fa-address-book fa-lg"></i></div>',
@@ -80,6 +149,11 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
     this.$box.remove();
   }
 });
+
+
+
+
+
 
 
 // createNode
@@ -232,8 +306,10 @@ HTMLWidgets.widget({
 
           if (selectedNode.data.level > 0) {  // Selected node is not a parent
 
-          // Create a new joint node for dragging to paper
-          var myNode = new joint.shapes.devs.PipelineNode({
+          var myNode = {};
+          if (x.icons === true) {
+          // Create a new joint node for dragging to paper - node with icon
+          myNode = new joint.shapes.devs.PipelineNodeIcon({
             size: { width: 50, height: 30 },
 //            size: { width: 100, height: 30 },
             hideDeleteButton : true,
@@ -285,6 +361,60 @@ HTMLWidgets.widget({
           myNode.prop('nodeType', selectedNode.text);
           myNode.prop('parentID', $(div_tree).jstree('get_node', selectedNode.parent).text);
           myNode.prop('nodeName', '');
+          } else {
+          // Create a new joint node for dragging to paper - node with label
+            myNode = new joint.shapes.devs.PipelineNode({
+            size: { width: 100, height: 30 },
+            hideDeleteButton : true,
+            led: { on: false, color: 'yellow', pulse: false },
+            inPorts: selectedNode.data.ports_in,
+            outPorts: selectedNode.data.ports_out,
+            hasInputPort : selectedNode.data.ports_in.length > 0,
+            hasOutputPort : selectedNode.data.ports_out.length > 0,
+            ports: {
+                groups: {
+                    'in': {
+                        position: "top",
+                        attrs: {
+                            '.port-body': {
+                                r: "6",
+                                fill: 'blue',
+                                magnet: 'passive'
+                            },
+                          '.port-label': {
+                            fill: "transparent"
+                          }
+                        },
+                        label: {
+                          position: {
+                            name: 'radial'
+                          }
+                        }
+                    },
+                    'out': {
+                        position: "bottom",
+                        attrs: {
+                            '.port-body': {
+                                r: "6",
+                                fill: 'red'
+                            },
+                            '.port-label': {
+                              fill: "transparent"
+                          }
+                        }
+                    }
+                }
+            },
+            attrs: {
+                rect: { fill: 'LightGrey', rx: 15, ry: 15 },
+                text: { text: selectedNode.text }
+            },
+          });
+          myNode.prop('nodeType', selectedNode.text);
+          myNode.prop('parentID', $(div_tree).jstree('get_node', selectedNode.parent).text);
+          myNode.prop('nodeName', '');
+          }
+
 
         // drag and drop code taken from SO post
         // http://stackoverflow.com/questions/31283895/joint-js-drag-and-drop-element-between-two-papers

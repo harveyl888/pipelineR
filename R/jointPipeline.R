@@ -1,6 +1,7 @@
 #' @export
 jointPipeline <- function(
                           nodes,
+                          icons = FALSE,
                           width = NULL,
                           height = NULL) {
 
@@ -53,7 +54,8 @@ jointPipeline <- function(
 
   # forward options using x
   x = list(
-    nodes = rjson::toJSON(l.nodes)
+    nodes = rjson::toJSON(l.nodes),
+    icons = icons
   )
 
   # create widget

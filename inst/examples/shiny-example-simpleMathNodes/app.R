@@ -66,7 +66,7 @@ server <- function(input, output, session) {
       setNames(l.parent, names(l.nodeTypes[[p]]))
     })
     l.nodes <- setNames(l.nodes, names(l.nodeTypes))
-    jointPipeline(nodes = l.nodes)
+    jointPipeline(nodes = l.nodes, icons = TRUE)
   })
 
   ## Add a node to the executable list (l.myNodes).
@@ -340,7 +340,6 @@ ui <- shinyUI(
   fluidPage(
     tags$head(tags$script(src="buttons.js")),
     br(),
-    HTML("<i class = 'fa fa-address-book-o'></i>"),
     fluidRow(
       column(8,
              jointPipelineOutput('jnt1', height='600px')
