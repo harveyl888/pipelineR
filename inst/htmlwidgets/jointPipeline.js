@@ -1,3 +1,5 @@
+// set a default icon
+var defaultIcon = 'play';
 
 // define the graphs
 var graph = new joint.dia.Graph;
@@ -25,9 +27,9 @@ joint.shapes.devs.PipelineNodeView = joint.dia.ElementView.extend({
 
     this.$box = $(_.template(this.template)());
     // Prevent paper from handling pointerdown.
-    this.$box.find('input,select').on('mousedown click', function(evt) {
-      evt.stopPropagation();
-    });
+//    this.$box.find('input,select').on('mousedown click', function(evt) {
+//      evt.stopPropagation();
+//    });
     this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
     // Update the box position whenever the underlying model changes.
     this.model.on('change', this.updateBox, this);
@@ -89,7 +91,7 @@ joint.shapes.devs.PipelineNodeIconView = joint.dia.ElementView.extend({
   template: [
     '<div class="html-element">',
     '<button class="delete">x</button>',
-    '<div style="text-align: center; line-height:30px"><i class = "fa fa-address-book fa-lg"></i></div>',
+    '<div style="text-align: center; line-height:30px"><i class = "fa fa-' + defaultIcon + ' fa-lg"></i></div>',
     '</div>'
   ].join(''),
   initialize: function() {
@@ -98,9 +100,9 @@ joint.shapes.devs.PipelineNodeIconView = joint.dia.ElementView.extend({
 
     this.$box = $(_.template(this.template)());
     // Prevent paper from handling pointerdown.
-    this.$box.find('input,select').on('mousedown click', function(evt) {
-      evt.stopPropagation();
-    });
+//    this.$box.find('input,select').on('mousedown click', function(evt) {
+//      evt.stopPropagation();
+//    });
     this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
     // Update the box position whenever the underlying model changes.
     this.model.on('change', this.updateBox, this);
@@ -118,6 +120,9 @@ joint.shapes.devs.PipelineNodeIconView = joint.dia.ElementView.extend({
   updateBox: function() {
       // Set the position and dimension of the box so that it covers the JointJS element.
       var bbox = this.model.getBBox();
+
+      // Update the icon
+      this.$box.find($(".fa")).removeClass('fa-play').addClass('fa-' + this.model.get('icon'));
 
       // Define visibility of delete button
       this.$box.find('button').toggleClass('invisible', this.model.get('hideDeleteButton'));
@@ -313,6 +318,7 @@ HTMLWidgets.widget({
             size: { width: 50, height: 30 },
 //            size: { width: 100, height: 30 },
             hideDeleteButton : true,
+            icon: 'circle',
             led: { on: false, color: 'yellow', pulse: false },
             inPorts: selectedNode.data.ports_in,
             outPorts: selectedNode.data.ports_out,
