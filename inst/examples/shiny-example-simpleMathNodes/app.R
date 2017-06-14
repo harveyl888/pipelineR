@@ -54,6 +54,7 @@ server <- function(input, output, session) {
       parent_name <- names(l.nodeTypes)[[p]]
       l.parent <- lapply(seq(l.nodeTypes[[p]]), function(n) {
         node_name <- names(l.nodeTypes[[p]])[[n]]
+        node_icon <- l.nodeTypes[[p]][[n]][['icon']]
         # input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
         input_ids <- which(sapply(l.nodeTypes[[p]][[n]][['parameters']], function(x) x['type'] == 'nodeinput'))
         if (length(input_ids) > 0) {
@@ -63,7 +64,8 @@ server <- function(input, output, session) {
           ports_in <- list()
         }
         ports_out <- list('out')
-        list(name = names(l.nodeTypes[[p]])[[n]], portnames = list('in'=ports_in, 'out'=ports_out))
+#        list(name = names(l.nodeTypes[[p]])[[n]], portnames = list('in'=ports_in, 'out'=ports_out))
+        list(name = node_name, icon = node_icon, portnames = list('in'=ports_in, 'out'=ports_out))
       })
       setNames(l.parent, names(l.nodeTypes[[p]]))
     })

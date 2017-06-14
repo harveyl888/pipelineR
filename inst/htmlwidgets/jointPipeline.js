@@ -320,7 +320,7 @@ HTMLWidgets.widget({
             size: { width: 50, height: 30 },
 //            size: { width: 100, height: 30 },
             hideDeleteButton : true,
-//            icon: 'expand',
+            icon: selectedNode.data.icon,
             led: { on: false, color: 'yellow', pulse: false },
             inPorts: selectedNode.data.ports_in,
             outPorts: selectedNode.data.ports_out,

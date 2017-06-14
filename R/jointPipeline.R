@@ -24,9 +24,9 @@ jointPipeline <- function(
       }
       if (is.null(node[['name']])) {  ## no name provided - assign one
         counter <- counter + 1
-        l.child[[length(l.child) + 1]] <- list(text = paste0('Node_', counter), data = c(level = 1, ports_in = list(portnames[['in']]), ports_out = list(portnames[['out']])))
+        l.child[[length(l.child) + 1]] <- list(text = paste0('Node_', counter), data = c(level = 1, icon = node[['icon']], ports_in = list(portnames[['in']]), ports_out = list(portnames[['out']])))
       } else {
-        l.child[[length(l.child) + 1]] <- list(text = node[['name']], data = c(level = 1, ports_in = list(node[['portnames']][['in']]), ports_out = list(node[['portnames']][['out']])))
+        l.child[[length(l.child) + 1]] <- list(text = node[['name']], data = c(level = 1, icon = node[['icon']], ports_in = list(node[['portnames']][['in']]), ports_out = list(node[['portnames']][['out']])))
       }
     }
     l.nodes[[length(l.nodes) + 1]] <- c(text = names(nodes)[p], data = list(list(level = 0)), children = list(l.child))
