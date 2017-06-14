@@ -23,6 +23,8 @@ l.nodeTypes <- nodeParameters()
 tempUploadFolder <- paste0(sub('/[^/]*$', '', tempdir()), '/pipeline')
 if (!dir.exists(tempUploadFolder)) dir.create(tempUploadFolder)
 
+## Choose a default icon
+setDefaultIcon('circle-o')
 
 server <- function(input, output, session) {
 
