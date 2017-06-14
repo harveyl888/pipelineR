@@ -5,7 +5,7 @@
 \title{Add a single node to stencil canvas}
 \usage{
 createNode(x = 0, y = 0, name = NULL, ports = c(`in` = 1, out = 1),
-  session = shiny::getDefaultReactiveDomain())
+  portnames, session = shiny::getDefaultReactiveDomain())
 }
 \arguments{
 \item{x}{position of node in canvas (x-coordinate) defined in px}
@@ -15,6 +15,11 @@ createNode(x = 0, y = 0, name = NULL, ports = c(`in` = 1, out = 1),
 \item{name}{node name (displayed as a label)}
 
 \item{ports}{vector defining number of inputs (in) and outputs (out) for the node}
+
+\item{portnames}{list optional named list of port ids.  portnames[['in']] contains a vector of input
+port names and portnames[['out']] contains a vector of output port names.  If included then \code{ports}
+is ignored.  If omitted then \code{ports} will be used to specify the input and output ports and
+names will be automatically assigned.}
 
 \item{session}{Shiny session}
 }
