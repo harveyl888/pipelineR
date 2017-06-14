@@ -19,3 +19,7 @@ dependencies:
    src: htmlwidgets/lib/jsTree-3.3.4
    script: jstree.min.js
    stylesheet: style.min.css
+ - name: font-awesome
+   version: 4.7.0
+   src: htmlwidgets/lib/font-awesome-4.7.0
+   stylesheet: css/font-awesome.min.css

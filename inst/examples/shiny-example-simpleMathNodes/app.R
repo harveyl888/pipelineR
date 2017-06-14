@@ -23,6 +23,8 @@ l.nodeTypes <- nodeParameters()
 tempUploadFolder <- paste0(sub('/[^/]*$', '', tempdir()), '/pipeline')
 if (!dir.exists(tempUploadFolder)) dir.create(tempUploadFolder)
 
+## Choose a default icon
+setDefaultIcon('circle-o')
 
 server <- function(input, output, session) {
 
@@ -54,19 +56,23 @@ server <- function(input, output, session) {
       parent_name <- names(l.nodeTypes)[[p]]
       l.parent <- lapply(seq(l.nodeTypes[[p]]), function(n) {
         node_name <- names(l.nodeTypes[[p]])[[n]]
-        input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
+        node_icon <- l.nodeTypes[[p]][[n]][['icon']]
+        # input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
+        input_ids <- which(sapply(l.nodeTypes[[p]][[n]][['parameters']], function(x) x['type'] == 'nodeinput'))
         if (length(input_ids) > 0) {
-          ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
+          # ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
+          ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][['parameters']][[x]][['name']]))
         } else {
           ports_in <- list()
         }
         ports_out <- list('out')
-        list(name = names(l.nodeTypes[[p]])[[n]], portnames = list('in'=ports_in, 'out'=ports_out))
+#        list(name = names(l.nodeTypes[[p]])[[n]], portnames = list('in'=ports_in, 'out'=ports_out))
+        list(name = node_name, icon = node_icon, portnames = list('in'=ports_in, 'out'=ports_out))
       })
       setNames(l.parent, names(l.nodeTypes[[p]]))
     })
     l.nodes <- setNames(l.nodes, names(l.nodeTypes))
-    jointPipeline(nodes = l.nodes)
+    jointPipeline(nodes = l.nodes, icons = TRUE)
   })
 
   ## Add a node to the executable list (l.myNodes).
@@ -76,8 +82,8 @@ server <- function(input, output, session) {
     l.myNodes[[n['id']]] <<- Node(id = n['id'],
                                   type = n['type'],
                                   name = n['name'],
-##                                  parameters = l.nodeTypes[[n['type']]])
-                                  parameters = l.nodeTypes[[n['parent']]][[n['type']]])
+                                  parameters = l.nodeTypes[[n['parent']]][[n['type']]][['parameters']])
+#    parameters = l.nodeTypes[[n['parent']]][[n['type']]])
   })
 
   ## Update node parameters

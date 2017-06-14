@@ -1,6 +1,7 @@
 #' @export
 jointPipeline <- function(
                           nodes,
+                          icons = FALSE,
                           width = NULL,
                           height = NULL) {
 
@@ -21,11 +22,16 @@ jointPipeline <- function(
       } else {  ## portnames exist
         portnames <- node[['portnames']]
       }
+      if (is.null(node[['icon']])) {
+        nodeicon <- getDefaultIcon()
+      } else {
+        nodeicon <- node[['icon']]
+      }
       if (is.null(node[['name']])) {  ## no name provided - assign one
         counter <- counter + 1
-        l.child[[length(l.child) + 1]] <- list(text = paste0('Node_', counter), data = c(level = 1, ports_in = list(portnames[['in']]), ports_out = list(portnames[['out']])))
+        l.child[[length(l.child) + 1]] <- list(text = paste0('Node_', counter), data = c(level = 1, icon = nodeicon, ports_in = list(portnames[['in']]), ports_out = list(portnames[['out']])))
       } else {
-        l.child[[length(l.child) + 1]] <- list(text = node[['name']], data = c(level = 1, ports_in = list(node[['portnames']][['in']]), ports_out = list(node[['portnames']][['out']])))
+        l.child[[length(l.child) + 1]] <- list(text = node[['name']], data = c(level = 1, icon = nodeicon, ports_in = list(node[['portnames']][['in']]), ports_out = list(node[['portnames']][['out']])))
       }
     }
     l.nodes[[length(l.nodes) + 1]] <- c(text = names(nodes)[p], data = list(list(level = 0)), children = list(l.child))
@@ -53,7 +59,8 @@ jointPipeline <- function(
 
   # forward options using x
   x = list(
-    nodes = rjson::toJSON(l.nodes)
+    nodes = rjson::toJSON(l.nodes),
+    icons = icons
   )
 
   # create widget
@@ -263,4 +270,26 @@ deleteButton <- function(id = NULL, state = TRUE, session = shiny::getDefaultRea
   if (is.null(id)) return()
   session$sendCustomMessage(type = 'deleteButton',
                             message = list(id = id, state = state))
+}
+
+#' set default icon
+#'
+#' Set the default icon
+#'
+#' @param icon name of FontAwesome icon
+#'
+#' @export
+setDefaultIcon <- function(icon) {
+  pkg.env$defaultIcon <- icon
+}
+
+#' get default icon
+#'
+#' Get the default icon
+#'
+#' @return name of default icon
+#'
+#' @export
+getDefaultIcon <- function() {
+  return(pkg.env$defaultIcon)
 }
