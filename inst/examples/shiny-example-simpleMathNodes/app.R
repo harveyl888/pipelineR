@@ -54,9 +54,11 @@ server <- function(input, output, session) {
       parent_name <- names(l.nodeTypes)[[p]]
       l.parent <- lapply(seq(l.nodeTypes[[p]]), function(n) {
         node_name <- names(l.nodeTypes[[p]])[[n]]
-        input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
+        # input_ids <- which(sapply(l.nodeTypes[[p]][[n]], function(x) x['type'] == 'nodeinput'))
+        input_ids <- which(sapply(l.nodeTypes[[p]][[n]][['parameters']], function(x) x['type'] == 'nodeinput'))
         if (length(input_ids) > 0) {
-          ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
+          # ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][[x]][['name']]))
+          ports_in <- unname(lapply(input_ids, function(x) l.nodeTypes[[p]][[n]][['parameters']][[x]][['name']]))
         } else {
           ports_in <- list()
         }
@@ -76,8 +78,8 @@ server <- function(input, output, session) {
     l.myNodes[[n['id']]] <<- Node(id = n['id'],
                                   type = n['type'],
                                   name = n['name'],
-##                                  parameters = l.nodeTypes[[n['type']]])
-                                  parameters = l.nodeTypes[[n['parent']]][[n['type']]])
+                                  parameters = l.nodeTypes[[n['parent']]][[n['type']]][['parameters']])
+#    parameters = l.nodeTypes[[n['parent']]][[n['type']]])
   })
 
   ## Update node parameters
