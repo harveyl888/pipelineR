@@ -202,6 +202,24 @@ isDAG <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
   }
 }
 
+#' Check if pipeline contains any open inputs
+#'
+#' Determine if pipeline contains input ports with no data
+#'
+#' @param jnt reference to htmlwidget
+#' @param session Shiny session
+#'
+#' @export
+openInputs <- function(jnt = NULL, session=shiny::getDefaultReactiveDomain()) {
+  df.ports <- session$input[[paste0(jnt, '_ports')]]
+  if (nrow(df.ports) > 0) {
+    numOpenPorts = nrow(df.ports[df.ports$port_type == 'in' & df.ports$connected == FALSE, ])
+    return(numOpenPorts > 0)
+  } else {
+    return(TRUE)
+  }
+}
+
 #' Highlight a node
 #'
 #' Highlight a specific node with a box

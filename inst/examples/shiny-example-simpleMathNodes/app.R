@@ -210,6 +210,14 @@ server <- function(input, output, session) {
                             easyClose = TRUE))
     }
 
+    ## Do we have an open input?
+    if (openInputs(jnt = 'jnt1', session = session)) {
+      error <- TRUE
+      showModal(modalDialog(title = 'Graph Error',
+                            'Error in graph.  Check for open inputs',
+                            easyClose = TRUE))
+    }
+
     if(!error) {
       runNodeOrder <- pipelineDFS(jnt = 'jnt1', session = session)
       allDisplayedNodes <- runNodeOrder
