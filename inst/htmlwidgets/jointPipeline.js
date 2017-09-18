@@ -493,30 +493,14 @@ HTMLWidgets.widget({
 
         var outputNodes = id + '_nodes:linksTable';
         var outputLinks = id + '_links:linksTable';
+        var outputPorts = id + '_ports:linksTable';
         var outputDFS = id + '_dfsRoot';
 
         // update pipeline output on any event
         graph.on('add change remove', function(eventName, cell) {
-          var pipelineNodes = graph.getElements();
-          if(pipelineNodes.length > 0) {
-            var outNodes = [];
-            for (var iNode in pipelineNodes) {
-              var node = pipelineNodes[iNode];
-              outNodes.push({
-                "id" : node.id,
-                "type" : node.prop("nodeType"),
-                "parent" : node.prop("parentID"),
-                "name" : node.prop("nodeName")
-              });
-            }
-            Shiny.onInputChange(outputNodes, outNodes);
-          } else {
-            Shiny.onInputChange(outputNodes, null);
-          }
-
+          var outLinks = [];
           var pipelineLinks = graph.getLinks();
           if (pipelineLinks.length > 0) {
-            var outLinks = [];
             for (var iLink in pipelineLinks) {
               var link = pipelineLinks[iLink];
               outLinks.push({
@@ -533,6 +517,39 @@ HTMLWidgets.widget({
             Shiny.onInputChange(outputLinks, outLinks);
           } else {
             Shiny.onInputChange(outputLinks, null);
+          }
+
+          var outNodes = [];
+          var outPorts = [];
+          var pipelineNodes = graph.getElements();
+          if(pipelineNodes.length > 0) {
+            for (var iNode in pipelineNodes) {
+              var node = pipelineNodes[iNode];
+              outNodes.push({
+                "id" : node.id,
+                "type" : node.prop("nodeType"),
+                "parent" : node.prop("parentID"),
+                "name" : node.prop("nodeName")
+              });
+              var nodePorts = node.portData.ports;
+              for (var iPort in nodePorts) {
+                var port = nodePorts[iPort];
+                var portLocation = (port.group == "in" ? "target" : "source");  // specify input or output port
+                findNode = $.grep(outLinks, function(x) { return x[portLocation + "_id"] == node.id & x.hasOwnProperty(portLocation + "_port") });
+                var findNodeOut = (findNode.length > 0 ? true : false);
+                outPorts.push({
+                  "node_id" : node.id,
+                  "port_type" : port.group,
+                  "port_id" : port.id,
+                  "connected" : findNodeOut
+                });
+              }
+            }
+            Shiny.onInputChange(outputNodes, outNodes);
+            Shiny.onInputChange(outputPorts, outPorts);
+          } else {
+            Shiny.onInputChange(outputNodes, null);
+            Shiny.onInputChange(outputPort, null);
           }
 
           // Return a root node for dfs search using igraph

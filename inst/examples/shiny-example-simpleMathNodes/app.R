@@ -332,7 +332,10 @@ server <- function(input, output, session) {
 
   ## Update a reactive variable with the executable nodes (for display purposes)
   observeEvent(input$butShowNodes, {
-    value$outputNodes <- l.myNodes
+    #value$outputNodes <- l.myNodes
+
+    value$outputNodes <- input$jnt1_ports
+
   })
 
   ## Output the executable nodes - useful for troubleshooting

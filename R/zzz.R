@@ -16,9 +16,13 @@ pkg.env <- new.env()
     }
   }, force = TRUE)
 
+  shiny::registerInputHandler('portsOut', function(data, ...) {
+    unlist(data)
+  }, force = TRUE)
 }
 
 .onUnload <- function(libname, pkgname) {
   shiny::removeInputHandler('nodeOut')
   shiny::removeInputHandler('linksTable')
+  shiny::removeInputHandler('portsOut')
 }
