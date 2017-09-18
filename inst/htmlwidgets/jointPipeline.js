@@ -535,7 +535,7 @@ HTMLWidgets.widget({
               for (var iPort in nodePorts) {
                 var port = nodePorts[iPort];
                 var portLocation = (port.group == "in" ? "target" : "source");  // specify input or output port
-                findNode = $.grep(outLinks, function(x) { return x[portLocation + "_id"] == node.id & x.hasOwnProperty(portLocation + "_port") });
+                findNode = $.grep(outLinks, function(x) { return x[portLocation + "_id"] == node.id && x[portLocation + "_port"] == port.id });
                 var findNodeOut = (findNode.length > 0 ? true : false);
                 outPorts.push({
                   "node_id" : node.id,
