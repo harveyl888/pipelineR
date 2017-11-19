@@ -295,7 +295,8 @@ HTMLWidgets.widget({
           // Enable marking available cells & magnets
           markAvailable: true,
           // Enable link snapping within 75px lookup radius
-          snapLinks: { radius: 75 },
+          // snapLinks: { radius: 75 },
+          snapLinks: false,
           // Limit movement to inside paper
 //          restrictTranslate : true
         });
