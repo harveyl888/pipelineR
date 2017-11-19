@@ -1,3 +1,4 @@
+#' @importFrom jsonlite toJSON
 #' @export
 jointPipeline <- function(
                           nodes,
@@ -59,7 +60,7 @@ jointPipeline <- function(
 
   # forward options using x
   x = list(
-    nodes = rjson::toJSON(l.nodes),
+    nodes = toJSON(l.nodes, auto_unbox = TRUE),
     icons = icons
   )
 
