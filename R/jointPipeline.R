@@ -273,7 +273,7 @@ changeStatus <- function(id = NULL, status = NULL, session = shiny::getDefaultRe
     pulse <- TRUE
   }
   session$sendCustomMessage(type = 'changeLED',
-                            message = list(id = id, color = led, pulse = pulse))
+                            message = list(id = id[[1]], color = led, pulse = pulse))
 }
 
 #' Change state of delete button
