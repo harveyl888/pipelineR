@@ -261,12 +261,38 @@ HTMLWidgets.widget({
         div_tree.id = id + '-tree';
         div_treecontainer.appendChild(div_tree);
 
-        div_all.appendChild(div_treecontainer);
-        div_all.appendChild(div_paper);
+        // split parameters
+        var div_left = document.createElement('div');
+        div_left.id = id + '-left';
+        div_left.appendChild(div_treecontainer);
+        var div_right = document.createElement('div');
+        div_right.id = id + '-right';
+        div_right.appendChild(div_paper);
+
+        div_left.classList.add('split');
+        div_left.classList.add('split-horizontal');
+        div_right.classList.add('split');
+        div_right.classList.add('split-horizontal');
+        div_paper.classList.add('split');
+        div_paper.classList.add('content');
+        div_treecontainer.classList.add('split');
+        div_treecontainer.classList.add('content');
+
+        div_all.appendChild(div_left);
+        div_all.appendChild(div_right);
+
+//        div_all.appendChild(div_treecontainer);
+//        div_all.appendChild(div_paper);
         el.appendChild(div_all);
 
         var outputSelectedNode = id + '_selectedNode:nodeOut';
         var outputLastDroppedNode = id + '_lastDroppedNode:nodeOut';
+
+        Split(['#' + id + '-left', '#' + id + '-right'], {
+          gutterSize: 8,
+          sizes: [20, 80],
+          cursor: 'col-resize'
+        });
 
         // define the paper and assign to div element
         paper = new joint.dia.Paper({
