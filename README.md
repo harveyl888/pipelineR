@@ -27,3 +27,7 @@ Each node is expressed in a named list with the following parameters:
 
 ## Apps
 Each example apps builds a pipelineR widget and provides additional functionality to run the pipeline.  Once built the pipeline runs by executing the nodes in order based on a graph.  Execution runs from the nodes without input through the pipeline.  The pipeline can branch in both the forward and backward direction but cannot contain nodes with open inputs nor can it be cyclic.
+
+![alt text](./pipelineR.png "")
+
+
