@@ -15,6 +15,7 @@ Add_Number <- function(i, n) {
 comment(Add_Number) <- '{"icon": "plus", "parameters": [{"name": "i", "type": "nodeinput"},
                          {"name": "n", "type": "numeric", "min": 1, "max": 100, "value": 50, "step": 1}]}'
 ```
+The range of inputs and outputs are currently quite limited.  Inputs allowed are file, text and numeric.  Output is currently just a text output.
 
 ## pipelineR widget
 This widget is based on the amazing jointJS library (https://www.jointjs.com/opensource).  It consists of two panes - the left contains the nodes and the right is the paper on which data processing pipelines can be built.  The htmlwidget is called by `jointPipeline` with the following parameters:
