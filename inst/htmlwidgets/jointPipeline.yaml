@@ -23,3 +23,7 @@ dependencies:
    version: 4.7.0
    src: htmlwidgets/lib/font-awesome-4.7.0
    stylesheet: css/font-awesome.min.css
+ - name: split
+   version: 1.3.5
+   src: htmlwidgets/lib/split-1.3.5
+   script: split.min.js

@@ -1,9 +1,15 @@
 /* Additional css for joint styling */
 
+html,
+ body {
+     height: 100%;
+ }
+
+
 .div_treecontainer {
-  position: relative;
-  float: left;
-  width: 20%;
+/*  position: relative;
+/*  float: left;*/
+/*  width: 20%; */
   height: 100%;
   background-color: #B0E0E6;
   overflow: scroll;
@@ -12,8 +18,8 @@
 
 .div_paper {
 /*  margin-left: 40%;*/
-  float: left;
-  width: 80%;
+/*  float: left;*/
+/*  width: 80%; */
   height: 100%;
   background-color: #FFFACD !important;
   overflow: scroll;
@@ -91,3 +97,12 @@
 }
 
 
+ .gutter.gutter-horizontal {
+     cursor: col-resize;
+      }
+
+ .split.split-horizontal,
+ .gutter.gutter-horizontal {
+     height: 100%;
+     float: left;
+ }
