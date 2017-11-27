@@ -4,7 +4,7 @@
 \alias{executeNode}
 \title{Execute a node}
 \usage{
-executeNode(fn = NULL, params = list())
+executeNode(fn = NULL, package = NULL, params = list())
 }
 \arguments{
 \item{fn}{Name of the function to run.}

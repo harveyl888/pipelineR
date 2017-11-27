@@ -5,7 +5,8 @@
 \title{Node class}
 \usage{
 Node(id = NA_character_, type = NA_character_, name = NA_character_,
-  parameters = list(), status = "queued", output = NULL)
+  package = NA_character_, parameters = list(), status = "queued",
+  output = NULL)
 }
 \arguments{
 \item{id}{Unique node identifier}
@@ -13,6 +14,8 @@ Node(id = NA_character_, type = NA_character_, name = NA_character_,
 \item{type}{Type of node (used to define internal parameters)}
 
 \item{name}{Name of node}
+
+\item{package}{Name of the package containing the function}
 
 \item{parameters}{List of parameters and their arguments (see details)}
 

@@ -86,12 +86,16 @@ nodeParameters <- function() {
 #' }
 #'
 #' @export
-executeNode <- function(fn = NULL, params = list()) {
+executeNode <- function(fn = NULL, package = NULL, params = list()) {
   if (is.null(fn)) return(list(result = 'error', output = 'no function specified'))
   if (!is.list(params)) return(list(result = 'error', output = 'parameters should be specified as a list'))
   if (!checkfnList(fn)) return(list(result = 'error', output = 'function not in list'))
   nodeOut <- tryCatch({
-    do.call(what = fn, args = params)
+    if(is.null(package)) {
+      do.call(what = fn, args = params)
+    } else {
+      do.call(what = getExportedValue(package, fn), args = params)
+    }
   }, error = function(e) {
     list(success = FALSE, output = 'error in running node') ## error caught whilst running node
   })

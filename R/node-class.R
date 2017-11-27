@@ -5,6 +5,7 @@
 #' @param id Unique node identifier
 #' @param type Type of node (used to define internal parameters)
 #' @param name Name of node
+#' @param package Name of the package containing the function
 #' @param parameters List of parameters and their arguments (see details)
 #' @param output Output of calculation for display or input into subsequent node
 #'
@@ -19,6 +20,7 @@
 Node <- function(id = NA_character_,
                  type = NA_character_,
                  name = NA_character_,
+                 package = NA_character_,
                  parameters = list(),
                  status = 'queued',
                  output = NULL)
@@ -28,6 +30,7 @@ Node <- function(id = NA_character_,
     id = id,
     type = type,
     name = name,
+    package = package,
     parameters = parameters,
     status = status,
     output = output

@@ -84,6 +84,7 @@ server <- function(input, output, session) {
     l.myNodes[[n['id']]] <<- Node(id = n['id'],
                                   type = n['type'],
                                   name = n['name'],
+                                  package = n['parent'],
                                   parameters = l.nodeTypes[[n['parent']]][[n['type']]][['parameters']])
 #    parameters = l.nodeTypes[[n['parent']]][[n['type']]])
   })
@@ -241,6 +242,7 @@ server <- function(input, output, session) {
       for (node in runNodeOrder) {  # loop through each executable node
         changeStatus(id = l.myNodes[[node$id]]$id, status = 'running', session = session)
         type <- l.myNodes[[node$id]]$type
+        package <- l.myNodes[[node$id]]$package
         parameters <- l.myNodes[[node$id]]$parameters
         l.parameters <- list()
         for (p in parameters) {  # grab the node function input names and values
@@ -252,7 +254,7 @@ server <- function(input, output, session) {
             l.parameters <- c(l.parameters, setNames(l.myNodes[[node$input[[p$name]]]]$output, p$name))
           }
         }
-        execute <- executeNode(type, l.parameters)  # execute the node
+        execute <- executeNode(type, package, l.parameters)  # execute the node
         if (execute$result == 'success') {
           changeStatus(id = l.myNodes[[node$id]]$id, status = 'completed', session = session)
           l.myNodes[[node$id]]$output <<- execute$output  # store the output
