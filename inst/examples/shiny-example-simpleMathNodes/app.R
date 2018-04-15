@@ -274,6 +274,7 @@ server <- function(input, output, session) {
           } else {
             value$restartFrom <- runNodeOrder[[match(node$id, sapply(runNodeOrder, function(x) x$id)) + 1]]$id
           }
+          l.myNodes[[value$restartFrom]]$status <<- 'queued'
           break
         }
       }
@@ -292,11 +293,26 @@ server <- function(input, output, session) {
 
   ## Run through the pipeline, executing each node in turn
   observeEvent(input$butRun, {
-    startFrom <- NULL
-    for (n in l.myNodes) {
-      if (n$status != 'completed') {
-        startFrom <- n$id
-        break
+
+    runNodeOrder <- pipelineDFS(jnt = 'jnt1', session = session)
+    print(runNodeOrder)
+
+    runNodeRef <- sapply(runNodeOrder, function(x) match(x$id, sapply(l.myNodes, function(y) y$id)))
+    print(runNodeRef)
+
+    ## account for completion of entire pipeline
+#    if (l.myNodes[[length(l.myNodes)]]$status == 'completed') {
+#    startFrom <- l.myNodes[[length(l.myNodes)]]$id
+    if (l.myNodes[[runNodeRef[length(runNodeRef)]]]$status == 'completed') {
+      startFrom <- l.myNodes[[runNodeRef[length(runNodeRef)]]]$id
+    } else {
+      startFrom <- NULL
+#      for (n in l.myNodes) {
+      for (n in l.myNodes[runNodeRef]) {
+        if (n$status != 'completed') {
+          startFrom <- n$id  ## restart from last non-complete node
+          break
+        }
       }
     }
     runNodes(continueFrom = startFrom)
