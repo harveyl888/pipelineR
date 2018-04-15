@@ -183,7 +183,7 @@ server <- function(input, output, session) {
 
     ## Set button states
     session$sendCustomMessage("disableButton", list(button = 'butRun', disabled = TRUE))
-    session$sendCustomMessage("disableButton", list(button = 'butResume', disabled = TRUE))
+#    session$sendCustomMessage("disableButton", list(button = 'butResume', disabled = TRUE))
     session$sendCustomMessage("disableButton", list(button = 'butReset', disabled = TRUE))
 
     ## Update parameters for the last selected node before switching to the new one
@@ -285,7 +285,7 @@ server <- function(input, output, session) {
 
     ## Set button states
     session$sendCustomMessage("disableButton", list(button = 'butRun', disabled = FALSE))
-    session$sendCustomMessage("disableButton", list(button = 'butResume', disabled = FALSE))
+#    session$sendCustomMessage("disableButton", list(button = 'butResume', disabled = FALSE))
     session$sendCustomMessage("disableButton", list(button = 'butReset', disabled = FALSE))
 
   }
@@ -307,9 +307,9 @@ server <- function(input, output, session) {
   })
 
   ## Restart the pipeline
-  observeEvent(input$butResume, {
-    runNodes(continueFrom = value$restartFrom)
-  })
+  # observeEvent(input$butResume, {
+  #   runNodes(continueFrom = value$restartFrom)
+  # })
 
   ## Reset pipeline from specific node
   resetPipeline <- function(startFrom = NULL) {
@@ -319,7 +319,8 @@ server <- function(input, output, session) {
     } else {
       startNodeRef <- 1
     }
-    for (n in 1:startNodeRef) l.myNodes[[n]]$status <<- 'queued'
+#    for (n in 1:startNodeRef) l.myNodes[[n]]$status <<- 'queued'
+    for (n in startNodeRef:length(l.myNodes)) l.myNodes[[n]]$status <<- 'queued'
     runNodeOrder <- runNodeOrder[startNodeRef:length(runNodeOrder)]
     sapply(runNodeOrder, function(x) changeStatus(id = x$id, status = 'none', session = session))
     for (node in runNodeOrder) {  # loop through each executable node
@@ -378,7 +379,7 @@ ui <- shinyUI(
                column(10, offset = 1,
                       actionButton('butRun', label = '', icon = icon('play'), class = 'btn btn-success', onclick="Shiny.onInputChange('pauseProcess', false)"),
                       actionButton('butPause', label = '', icon = icon('pause'), class = 'btn btn-warning', onclick="Shiny.onInputChange('pauseProcess', true)"),
-                      actionButton('butResume', label = '', icon = icon('step-forward'), class = 'btn btn-warning', onclick="Shiny.onInputChange('pauseProcess', false)"),
+                      # actionButton('butResume', label = '', icon = icon('step-forward'), class = 'btn btn-warning', onclick="Shiny.onInputChange('pauseProcess', false)"),
                       actionButton('butReset', label = '', icon = icon('rotate-left'), class = 'btn btn-danger', onclick="Shiny.onInputChange('pauseProcess', false)")
                )
              ),
