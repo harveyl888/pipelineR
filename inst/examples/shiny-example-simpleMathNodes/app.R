@@ -255,9 +255,11 @@ server <- function(input, output, session) {
         execute <- executeNode(type, package, l.parameters)  # execute the node
         if (execute$result == 'success') {
           changeStatus(id = l.myNodes[[node$id]]$id, status = 'completed', session = session)
+          l.myNodes[[node$id]]$status <<- 'completed'
           l.myNodes[[node$id]]$output <<- execute$output  # store the output
         } else {
           changeStatus(id = l.myNodes[[node$id]]$id, status = 'error', session = session)
+          l.myNodes[[node$id]]$status <<- 'error'
           showModal(modalDialog(title = 'Node Error',
                                 h4(paste0('Error in node: ', l.myNodes[[node$id]]$id)),
                                 h5(execute$output),
@@ -290,7 +292,14 @@ server <- function(input, output, session) {
 
   ## Run through the pipeline, executing each node in turn
   observeEvent(input$butRun, {
-    runNodes(continueFrom = NULL)
+    startFrom <- NULL
+    for (n in l.myNodes) {
+      if (n$status != 'completed') {
+        startFrom <- n$id
+        break
+      }
+    }
+    runNodes(continueFrom = startFrom)
   })
 
   observeEvent(input$butPause, {
@@ -310,6 +319,7 @@ server <- function(input, output, session) {
     } else {
       startNodeRef <- 1
     }
+    for (n in 1:startNodeRef) l.myNodes[[n]]$status <<- 'queued'
     runNodeOrder <- runNodeOrder[startNodeRef:length(runNodeOrder)]
     sapply(runNodeOrder, function(x) changeStatus(id = x$id, status = 'none', session = session))
     for (node in runNodeOrder) {  # loop through each executable node
