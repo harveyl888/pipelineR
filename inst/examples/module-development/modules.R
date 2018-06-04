@@ -40,7 +40,8 @@ jntModuleUI <- function(id) {
 ## Server code
 jntModule <- function(input, output, session, l.nodeTypes) {
 
-  value <- reactiveValues(myNodes = list())
+  value <- reactiveValues(myNodes = list(),
+                          lastNodeId = NULL)
 
   print(2)
 
@@ -73,11 +74,87 @@ jntModule <- function(input, output, session, l.nodeTypes) {
   # This is triggered when a node is added to the graph canvas.
   observeEvent(input$jnt_lastDroppedNode, {
     n <- input$jnt_lastDroppedNode
-    value$myNodes <- Node(id = n['id'],
+    value$myNodes[[n['id']]] <- Node(id = n['id'],
                                   type = n['type'],
                                   name = n['name'],
                                   package = n['parent'],
                                   parameters = l.nodeTypes[[n['parent']]][[n['type']]][['parameters']])
+  })
+
+
+  ## Update node parameters
+  ## Nodes are updated when edited and just before running the workflow
+  nodeUpdate <- function(nodeID) {
+
+      l.params <- value$myNodes[[nodeID]][['parameters']]  # Get list of parameters
+
+      for (p in 1:length(l.params)) {  # loop through the parameters
+        ## Has the parameter changed?
+        if (l.params[[p]][['type']] == 'numeric') {  # update value
+          l.params[[p]][['value']] <- input[[paste0('inp', '_', l.params[[p]]['name'])]]
+        } else if (l.params[[p]][['type']] == 'text') {  # update value
+          l.params[[p]][['value']] <- input[[paste0('inp', '_', l.params[[p]]['name'])]]
+        } else if (l.params[[p]][['type']] == 'file') {  # update value
+          uploadFile <- input[[paste0(nodeID, '_', l.params[[p]]['name'])]]
+          file.copy(uploadFile$datapath, paste(tempUploadFolder, uploadFile$name, sep = '/'))
+          l.params[[p]][['value']] <- paste(tempUploadFolder, uploadFile$name, sep = '/')
+        }
+      }
+      isolate({value$myNodes[[nodeID]][['parameters']] <- l.params})  # Update the parameters
+  }
+
+
+
+  ## Dynamically generate a UI for node parameters.  Triggered when a node is selected.
+  output$uiNodeParameters <- renderUI({
+
+    req(input$jnt_selectedNode)
+
+    ns <- session$ns
+
+    ## Grab the selected node id
+    nodeID <- input$jnt_selectedNode['id']
+
+    ## Update parameters for the last selected node before switching to the new one
+    if (!is.null(value$lastNodeId)) {
+      if (value$lastNodeId != nodeID) {
+        nodeUpdate(value$lastNodeId)
+      }
+    }
+
+    ## Remember this node in order to update the parameters before switching to another
+    value$lastNodeId <- nodeID
+
+    ## Build the UI based on the node type
+    if (!is.null(value$myNodes[[nodeID]])) {
+      params <- value$myNodes[[nodeID]][['parameters']]
+      l.widgets <- lapply(params, function(x) {
+        if (x['type'] == 'numeric') {
+          numericInput(inputId = paste0(ns('inp'), '_', x['name']),
+                       label = x['name'],
+                       min = x['min'],
+                       max = x['max'],
+                       value = x['value'],
+                       step = x['step'],
+                       width = '50%')
+        } else if (x['type'] == 'text') {
+          textInput(inputId = paste0(ns('inp'), '_', x['name']),
+                    label = x['name'],
+                    value = x['value'],
+                    width = '50%')
+        } else if (x['type'] == 'file') {
+          fileInput(inputId = paste0(ns('inp'), '_', x['name']),
+                    label = x['name'])
+        }
+      })
+
+      ## Add a heading (node name)
+      l.heading <- list(h5(value$myNodes[[nodeID]]['name'], style = "text-align:center; font-weight: bold; color: red"), br())
+
+      ## Return the UI
+      l.widgets <- c(l.heading, l.widgets)
+      div(id = ns("nodeParameters"), style = "margin: 20px 30px 20px 30px;", do.call(tagList, l.widgets))
+    }
   })
 
 
