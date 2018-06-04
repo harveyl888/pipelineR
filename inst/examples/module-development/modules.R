@@ -5,34 +5,42 @@ library(pipelineR)
 
 jntModuleUI <- function(id) {
   ns <- NS(id)
-  fluidRow(
-    column(8,
-           jointPipelineOutput(ns('jnt'), height='600px')
-    ),
-    column(4,
-           fluidRow(
-             column(10, offset = 1,
-                    actionButton(ns('butRun'), label = '', icon = icon('play'), class = 'btn btn-success', onclick="Shiny.onInputChange('pauseProcess', false)"),
-                    actionButton(ns('butPause'), label = '', icon = icon('pause'), class = 'btn btn-warning', onclick="Shiny.onInputChange('pauseProcess', true)"),
-                    actionButton(ns('butReset'), label = '', icon = icon('rotate-left'), class = 'btn btn-danger', onclick="Shiny.onInputChange('pauseProcess', false)")
+  tagList(
+    fluidRow(
+      column(8,
+             jointPipelineOutput(ns('jnt'), height='600px')
+      ),
+      column(4,
+             fluidRow(
+               column(10, offset = 1,
+                      actionButton(ns('butRun'), label = '', icon = icon('play'), class = 'btn btn-success', onclick="Shiny.onInputChange('pauseProcess', false)"),
+                      actionButton(ns('butPause'), label = '', icon = icon('pause'), class = 'btn btn-warning', onclick="Shiny.onInputChange('pauseProcess', true)"),
+                      actionButton(ns('butReset'), label = '', icon = icon('rotate-left'), class = 'btn btn-danger', onclick="Shiny.onInputChange('pauseProcess', false)")
+               )
+             ),
+             div(id = ns('divParamsBox'), style = 'height: 255px; margin-top: 10px; padding: 10px 10px 10px 10px; border-style: solid; border-radius: 25px',
+                 div(id = ns('divParams'), style = 'height: 235px; overflow-y: scroll',
+                     uiOutput(ns('uiNodeParameters'))
+                 )
+             ),
+             div(id = ns('divOutputBox'), style = 'height: 298px; margin-top: 2px; padding: 10px 10px 10px 10px; border-style: solid; border-radius: 25px',
+                 div(id = ns('divOutput'), style = 'height: 278px; overflow: auto',
+                     uiOutput(ns('uiNodeOutput'))
+                 )
              )
-           ),
-           div(id = ns('divParamsBox'), style = 'height: 255px; margin-top: 10px; padding: 10px 10px 10px 10px; border-style: solid; border-radius: 25px',
-               div(id = ns('divParams'), style = 'height: 235px; overflow-y: scroll',
-                   uiOutput(ns('uiNodeParameters'))
-               )
-           ),
-           div(id = ns('divOutputBox'), style = 'height: 298px; margin-top: 2px; padding: 10px 10px 10px 10px; border-style: solid; border-radius: 25px',
-               div(id = ns('divOutput'), style = 'height: 278px; overflow: auto',
-                   uiOutput(ns('uiNodeOutput'))
-               )
-           )
+      )
+    ),
+    fluidRow(
+      verbatimTextOutput(ns('txtDetails'))
     )
   )
+
 }
 
 ## Server code
-jntModule <- function(input, output, session, l.nodeTypes, l.myNodes) {
+jntModule <- function(input, output, session, l.nodeTypes) {
+
+  value <- reactiveValues(myNodes = list())
 
   print(2)
 
@@ -61,14 +69,20 @@ jntModule <- function(input, output, session, l.nodeTypes, l.myNodes) {
   print(3)
 
 
+  ## Add a node to the executable list (value$myNodes).
   # This is triggered when a node is added to the graph canvas.
   observeEvent(input$jnt_lastDroppedNode, {
-    print('node dropped')
+    n <- input$jnt_lastDroppedNode
+    value$myNodes <- Node(id = n['id'],
+                                  type = n['type'],
+                                  name = n['name'],
+                                  package = n['parent'],
+                                  parameters = l.nodeTypes[[n['parent']]][[n['type']]][['parameters']])
   })
 
 
   observeEvent(input$butRun, {
-    print(5)
+    print(value$myNodes)
   })
 
   observeEvent(input$butPause, {
@@ -78,6 +92,15 @@ jntModule <- function(input, output, session, l.nodeTypes, l.myNodes) {
   observeEvent(input$butReset, {
     print(7)
   })
+
+  ## Output some details - useful for troubleshooting
+  output$txtDetails <- renderPrint({
+    lastDropped <- input$jnt_lastDroppedNode
+    selected <- input$jnt_selectedNode
+    print(paste0('Last dropped node = ', lastDropped['name']))
+    print(paste0('Selected node = ', selected['name']))
+  })
+
 
 }
 

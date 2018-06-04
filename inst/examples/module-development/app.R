@@ -38,7 +38,7 @@ server <- function(input, output, session) {
 
   print(1)
 
-  callModule(jntModule, 'jnt1', l.nodeTypes, l.myNodes)
+  callModule(jntModule, 'jnt1', l.nodeTypes)
 
   print(4)
 
