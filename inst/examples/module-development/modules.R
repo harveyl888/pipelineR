@@ -14,7 +14,7 @@ jntModuleUI <- function(id) {
              column(10, offset = 1,
                     actionButton(ns('butRun'), label = '', icon = icon('play'), class = 'btn btn-success', onclick="Shiny.onInputChange('pauseProcess', false)"),
                     actionButton(ns('butPause'), label = '', icon = icon('pause'), class = 'btn btn-warning', onclick="Shiny.onInputChange('pauseProcess', true)"),
-                    actionButton('butReset', label = '', icon = icon('rotate-left'), class = 'btn btn-danger', onclick="Shiny.onInputChange('pauseProcess', false)")
+                    actionButton(ns('butReset'), label = '', icon = icon('rotate-left'), class = 'btn btn-danger', onclick="Shiny.onInputChange('pauseProcess', false)")
              )
            ),
            div(id = ns('divParamsBox'), style = 'height: 255px; margin-top: 10px; padding: 10px 10px 10px 10px; border-style: solid; border-radius: 25px',
@@ -59,6 +59,19 @@ jntModule <- function(input, output, session, l.nodeTypes, l.myNodes) {
   })
 
   print(3)
-    
+
+
+  observeEvent(input$butRun, {
+    print(5)
+  })
+
+  observeEvent(input$butPause, {
+    print(6)
+  })
+
+  observeEvent(input$butReset, {
+    print(7)
+  })
+
 }
 
