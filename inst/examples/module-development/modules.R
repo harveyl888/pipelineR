@@ -61,6 +61,12 @@ jntModule <- function(input, output, session, l.nodeTypes, l.myNodes) {
   print(3)
 
 
+  # This is triggered when a node is added to the graph canvas.
+  observeEvent(input$jnt_lastDroppedNode, {
+    print('node dropped')
+  })
+
+
   observeEvent(input$butRun, {
     print(5)
   })
