@@ -401,23 +401,24 @@ jntModule <- function(input, output, session, l.nodeTypes) {
 
 
   observeEvent(input$butRun, {
-    runNodeOrder <- pipelineDFS1()
-
-    runNodeRef <- sapply(runNodeOrder, function(x) match(x$id, sapply(value$myNodes, function(y) y$id)))
-
-    ## account for completion of entire pipeline
-    if (value$myNodes[[runNodeRef[length(runNodeRef)]]]$status == 'completed') {
-      startFrom <- value$myNodes[[runNodeRef[length(runNodeRef)]]]$id
-    } else {
-      startFrom <- NULL
-      for (n in value$myNodes[runNodeRef]) {
-        if (n$status != 'completed') {
-          startFrom <- n$id  ## restart from last non-complete node
-          break
-        }
-      }
-    }
-    runNodes(continueFrom = startFrom)
+    # runNodeOrder <- pipelineDFS1()
+    #
+    # runNodeRef <- sapply(runNodeOrder, function(x) match(x$id, sapply(value$myNodes, function(y) y$id)))
+    #
+    # ## account for completion of entire pipeline
+    # if (value$myNodes[[runNodeRef[length(runNodeRef)]]]$status == 'completed') {
+    #   startFrom <- value$myNodes[[runNodeRef[length(runNodeRef)]]]$id
+    # } else {
+    #   startFrom <- NULL
+    #   for (n in value$myNodes[runNodeRef]) {
+    #     if (n$status != 'completed') {
+    #       startFrom <- n$id  ## restart from last non-complete node
+    #       break
+    #     }
+    #   }
+    # }
+    # runNodes(continueFrom = startFrom)
+    runNodes(continueFrom = NULL)
   })
 
   observeEvent(input$butPause, {
