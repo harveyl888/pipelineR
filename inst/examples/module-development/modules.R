@@ -160,6 +160,33 @@ jntModule <- function(input, output, session, l.nodeTypes) {
   })
 
 
+  ## Dynamically generate a UI for node output.  Triggered when a node is selected.
+  output$uiNodeOutput <- renderUI({
+    req(input$jnt_selectedNode)
+
+    ns <- session$ns
+
+    widget <- ''
+
+    ## Grab the selected node id
+    nodeID <- input$jnt_selectedNode['id']
+
+    ## Get the node output and determine its type
+    nodeOutput <- value$myNodes[[nodeID]]$output
+
+    if (!is.null(nodeOutput)) {
+      nodeOutputType <- class(nodeOutput)
+
+      ## Build the output based on the type
+      if (nodeOutputType %in% c('numeric', 'integer', 'character')) {
+        widget <- tags$p(nodeOutput)
+      }
+    }
+    div(id = ns("nodeOutput"), style = "margin: 20px 30px 20px 30px;", widget)
+  })
+
+
+
 
   # Perform a depth-first search on a pipeline.  Initial node is determined in jointPipeline.js
   # by identifying the first node without an input.  If all nodes have input then the first
