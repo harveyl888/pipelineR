@@ -2,6 +2,8 @@
 library(shiny)
 library(pipelineR)
 
+library(igraph)
+
 
 jntModuleUI <- function(id) {
   ns <- NS(id)
@@ -158,8 +160,237 @@ jntModule <- function(input, output, session, l.nodeTypes) {
   })
 
 
+
+  # Perform a depth-first search on a pipeline.  Initial node is determined in jointPipeline.js
+  # by identifying the first node without an input.  If all nodes have input then the first
+  # node added is used.
+  pipelineDFS1 <- function()
+  {
+    df.links <- input$jnt_links
+    if (nrow(df.links) > 0) {
+      g <- make_directed_graph(edges = unlist(as.vector(t(df.links[, c("source_id", "target_id")]))))
+      dfs_out <- dfs(g, root = input$jnt__dfsRoot, neimode = "in", order.out = T)
+      orderedIDs <- V(g)$name[as.numeric(dfs_out$order.out)]
+      l.dfs <- lapply(orderedIDs, function(x) {
+        foundInputNode <- df.links[df.links$target_id == x, ]
+        if (nrow(foundInputNode) > 0) {
+          return(list(id = x, input = as.list(setNames(foundInputNode[["source_id"]],
+                                                       foundInputNode[["target_port"]]))))
+        }
+        else {
+          return(list(id = x, input = list()))
+        }
+      })
+      return(l.dfs)
+    }
+    else {
+      return(NULL)
+    }
+  }
+
+
+  # Determine if pipeline is a directed acyclic graph.  If graph is cyclic there's a danger of
+  # getting caught in an infinite loop.
+  isDAG1 <- function() {
+    df.links <- input$jnt_links
+    if (nrow(df.links) > 0) {
+      g <- make_directed_graph(edges = unlist(as.vector(t(df.links[, c('source_id', 'target_id')]))))
+      return(is_dag(g))
+    } else {
+      return(TRUE)
+    }
+  }
+
+  # Determine if pipeline contains input ports with no data
+  openInputs1 <- function() {
+    df.ports <- input$jnt_ports
+    if (nrow(df.ports) > 0) {
+      numOpenPorts = nrow(df.ports[df.ports$port_type == 'in' & df.ports$connected == FALSE, ])
+      return(numOpenPorts > 0)
+    } else {
+      return(TRUE)
+    }
+  }
+
+
+  # Change the status of a node.  Status is shown by changing the border around the node.
+  changeStatus1 <- function(id = NULL, status = NULL) {
+    if (is.null(id)) return()
+    led <- FALSE
+    if (status == 'none') {
+      led <- 'none'
+      pulse <- FALSE
+    } else if (status == 'queued') {
+      led <- 'yellow'
+      pulse <- FALSE
+    } else if (status == 'running') {
+      led <- 'green'
+      pulse <- TRUE
+    } else if (status == 'completed') {
+      led <- 'green'
+      pulse = FALSE
+    } else if (status == 'error') {
+      led <- 'red'
+      pulse <- TRUE
+    }
+    session$sendCustomMessage(type = 'changeLED',
+                              message = list(id = id[[1]], color = led, pulse = pulse))
+  }
+
+
+  # Set delete button to visible or hidden
+  deleteButton1 <- function(id = NULL, state = TRUE) {
+    if (is.null(id)) return()
+    session$sendCustomMessage(type = 'deleteButton',
+                              message = list(id = id, state = state))
+  }
+
+
+
+  ## Run the workflow from the first node or a specified one
+  runNodes <- function(continueFrom = NULL) {
+
+    ns <- session$ns
+
+    ## Set button states
+    session$sendCustomMessage("disableButton", list(button = ns('butRun'), disabled = TRUE))
+    session$sendCustomMessage("disableButton", list(button = ns('butReset'), disabled = TRUE))
+
+    ## Update parameters for the last selected node before switching to the new one
+    if (!is.null(value$lastNodeId)) {
+      nodeUpdate(value$lastNodeId)
+    }
+
+    ## Check for errors
+    error <- FALSE
+
+    ## Do any nodes contain an error?
+    errorNodes <- which(sapply(value$myNodes, function(x) x$status) == 'error')
+    if (length(errorNodes) > 0) {
+      error <- TRUE
+      showModal(modalDialog(title = 'Node Error',
+                            paste0('Error in nodes: ', paste0(sapply(value$myNodes[q], function(x) x$id), collapse = ', ')),
+                            easyClose = TRUE))
+    }
+
+    ## Do we have a directed acyclic graph?
+    if (!isDAG1()) {
+      error <- TRUE
+      showModal(modalDialog(title = 'Graph Error',
+                            'Error in graph.  Not directed acyclic',
+                            easyClose = TRUE))
+    }
+
+    ## Do we have an open input?
+    if (openInputs1()) {
+      error <- TRUE
+      showModal(modalDialog(title = 'Graph Error',
+                            'Error in graph.  Check for open inputs',
+                            easyClose = TRUE))
+    }
+
+    if(!error) {
+      runNodeOrder <- pipelineDFS1()
+      allDisplayedNodes <- runNodeOrder
+
+      ## hide delete buttons
+      sapply(allDisplayedNodes, function(x) deleteButton1(id = x, state = FALSE))
+
+      if (!is.null(continueFrom)) {  # start from a specific node
+        startNodeRef <- match(continueFrom, sapply(runNodeOrder, function(x) x$id))
+      } else {
+        startNodeRef <- 1
+      }
+
+      value$output <- ''
+
+      runNodeOrder <- runNodeOrder[startNodeRef:length(runNodeOrder)]
+
+      sapply(runNodeOrder, function(x) changeStatus1(id = x$id, status = 'queued'))
+      for (node in runNodeOrder) {  # loop through each executable node
+        changeStatus1(id = value$myNodes[[node$id]]$id, status = 'running')
+        type <- value$myNodes[[node$id]]$type
+        package <- value$myNodes[[node$id]]$package
+        parameters <- value$myNodes[[node$id]]$parameters
+        l.parameters <- list()
+        for (p in parameters) {  # grab the node function input names and values
+          if (p$type %in% c('numeric', 'text')) {
+            l.parameters <- c(l.parameters, setNames(p$value, p$name))
+          } else if (p$type == 'file') {
+            l.parameters <- c(l.parameters, setNames(p$value, p$name))
+          } else if (p$type == 'nodeinput') {  ## output from last node pushed in as input to current node
+
+            # print(p$name)
+            # print(node$input)
+            # print(value$myNodes[[node$input[[p$name]]]]$output)
+
+            l.parameters <- c(l.parameters, setNames(value$myNodes[[node$input[[p$name]]]]$output, p$name))
+          }
+        }
+        execute <- executeNode(type, package, l.parameters)  # execute the node
+        if (execute$result == 'success') {
+          changeStatus1(id = value$myNodes[[node$id]]$id, status = 'completed')
+          value$myNodes[[node$id]]$status <- 'completed'
+          value$myNodes[[node$id]]$output <- execute$output  # store the output
+        } else {
+          changeStatus1(id = l.myNodes[[node$id]]$id, status = 'error')
+          value$myNodes[[node$id]]$status <- 'error'
+          showModal(modalDialog(title = 'Node Error',
+                                h4(paste0('Error in node: ', value$myNodes[[node$id]]$id)),
+                                h5(execute$output),
+                                easyClose = TRUE))
+          value$restartFrom <- node$id  ## restart from the node with error
+          break
+        }
+        httpuv::service()  # refresh
+        if (isTRUE(input$pauseProcess)) {
+          if (match(node$id, sapply(runNodeOrder, function(x) x$id)) == length(runNodeOrder)) {  ## last node
+            value$restartFrom <- node$id
+          } else {
+            value$restartFrom <- runNodeOrder[[match(node$id, sapply(runNodeOrder, function(x) x$id)) + 1]]$id
+          }
+          value$myNodes[[value$restartFrom]]$status <- 'queued'
+          break
+        }
+       }
+
+      ## restore delete buttons
+      sapply(allDisplayedNodes, function(x) deleteButton1(id = x, state = TRUE))
+
+    }
+
+    ## Set button states
+    session$sendCustomMessage("disableButton", list(button = ns('butRun'), disabled = FALSE))
+    session$sendCustomMessage("disableButton", list(button = ns('butReset'), disabled = FALSE))
+
+    lapply(value$myNodes, function(n) {
+      print(n$output)
+    })
+
+
+  }
+
+
+
+
   observeEvent(input$butRun, {
-    print(value$myNodes)
+    runNodeOrder <- pipelineDFS1()
+
+    runNodeRef <- sapply(runNodeOrder, function(x) match(x$id, sapply(value$myNodes, function(y) y$id)))
+
+    ## account for completion of entire pipeline
+    if (value$myNodes[[runNodeRef[length(runNodeRef)]]]$status == 'completed') {
+      startFrom <- value$myNodes[[runNodeRef[length(runNodeRef)]]]$id
+    } else {
+      startFrom <- NULL
+      for (n in value$myNodes[runNodeRef]) {
+        if (n$status != 'completed') {
+          startFrom <- n$id  ## restart from last non-complete node
+          break
+        }
+      }
+    }
+    runNodes(continueFrom = startFrom)
   })
 
   observeEvent(input$butPause, {
