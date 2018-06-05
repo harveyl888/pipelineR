@@ -1,9 +1,7 @@
 
 library(shiny)
 library(pipelineR)
-
 library(igraph)
-
 
 jntModuleUI <- function(id) {
   ns <- NS(id)
@@ -15,9 +13,9 @@ jntModuleUI <- function(id) {
       column(4,
              fluidRow(
                column(10, offset = 1,
-                      actionButton(ns('butRun'), label = '', icon = icon('play'), class = 'btn btn-success', onclick="Shiny.onInputChange('pauseProcess', false)"),
-                      actionButton(ns('butPause'), label = '', icon = icon('pause'), class = 'btn btn-warning', onclick="Shiny.onInputChange('pauseProcess', true)"),
-                      actionButton(ns('butReset'), label = '', icon = icon('rotate-left'), class = 'btn btn-danger', onclick="Shiny.onInputChange('pauseProcess', false)")
+                      actionButton(ns('butRun'), label = '', icon = icon('play'), class = 'btn btn-success', onclick=paste0('Shiny.onInputChange("', ns('pauseProcess'), '", false)')),
+                      actionButton(ns('butPause'), label = '', icon = icon('pause'), class = 'btn btn-warning', onclick=paste0('Shiny.onInputChange("', ns('pauseProcess'), '", true)')),
+                      actionButton(ns('butReset'), label = '', icon = icon('rotate-left'), class = 'btn btn-danger', onclick=paste0('Shiny.onInputChange("', ns('pauseProcess'), '", false)'))
                )
              ),
              div(id = ns('divParamsBox'), style = 'height: 255px; margin-top: 10px; padding: 10px 10px 10px 10px; border-style: solid; border-radius: 25px',
@@ -33,7 +31,8 @@ jntModuleUI <- function(id) {
       )
     ),
     fluidRow(
-      verbatimTextOutput(ns('txtDetails'))
+      verbatimTextOutput(ns('txtDetails')),
+      numericInput(ns('num'), label = 'num', value = 50, min = 0, max = 100)
     )
   )
 
@@ -275,7 +274,11 @@ jntModule <- function(input, output, session, l.nodeTypes) {
 
 
   ## Run the workflow from the first node or a specified one
-  runNodes <- function(continueFrom = NULL) {
+#  runNodes <- function(continueFrom = NULL) {
+
+  runNodes <- reactive({
+
+    continueFrom <- NULL
 
     ns <- session$ns
 
@@ -360,7 +363,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
           value$myNodes[[node$id]]$status <- 'completed'
           value$myNodes[[node$id]]$output <- execute$output  # store the output
         } else {
-          changeStatus1(id = l.myNodes[[node$id]]$id, status = 'error')
+          changeStatus1(id = value$myNodes[[node$id]]$id, status = 'error')
           value$myNodes[[node$id]]$status <- 'error'
           showModal(modalDialog(title = 'Node Error',
                                 h4(paste0('Error in node: ', value$myNodes[[node$id]]$id)),
@@ -369,14 +372,22 @@ jntModule <- function(input, output, session, l.nodeTypes) {
           value$restartFrom <- node$id  ## restart from the node with error
           break
         }
+
+        print(input$pauseProcess)
+
         httpuv::service()  # refresh
+        print(input$num)
+
         if (isTRUE(input$pauseProcess)) {
+
+          print('paused')
+
           if (match(node$id, sapply(runNodeOrder, function(x) x$id)) == length(runNodeOrder)) {  ## last node
             value$restartFrom <- node$id
           } else {
             value$restartFrom <- runNodeOrder[[match(node$id, sapply(runNodeOrder, function(x) x$id)) + 1]]$id
           }
-          value$myNodes[[value$restartFrom]]$status <- 'queued'
+##          value$myNodes[[value$restartFrom]]$status <- 'queued'
           break
         }
        }
@@ -395,8 +406,24 @@ jntModule <- function(input, output, session, l.nodeTypes) {
     })
 
 
-  }
+  })
 
+
+  ## Reset pipeline from specific node
+  resetPipeline <- function(startFrom = NULL) {
+    runNodeOrder <- pipelineDFS1()
+    if (!is.null(startFrom)) {  # start from a specific node
+      startNodeRef <- match(startFrom, sapply(runNodeOrder, function(x) x$id))
+    } else {
+      startNodeRef <- 1
+    }
+    for (n in startNodeRef:length(value$myNodes)) value$myNodes[[n]]$status <<- 'queued'
+    runNodeOrder <- runNodeOrder[startNodeRef:length(runNodeOrder)]
+    sapply(runNodeOrder, function(x) changeStatus(id = x$id, status = 'none'))
+    for (node in runNodeOrder) {  # loop through each executable node
+      value$myNodes[[node$id]]$output <- NULL
+    }
+  }
 
 
 
@@ -418,21 +445,30 @@ jntModule <- function(input, output, session, l.nodeTypes) {
     #   }
     # }
     # runNodes(continueFrom = startFrom)
-    runNodes(continueFrom = NULL)
+#    runNodes(continueFrom = NULL)
+    runNodes()
   })
 
+  ## pause button pressed
+  ## reset the pipeline from the current node
   observeEvent(input$butPause, {
-    print(6)
+    resetPipeline(startFrom = value$restartFrom)
   })
 
+  ## reset button pressed
+  ## reset the pipeline from the first node
   observeEvent(input$butReset, {
-    print(7)
+    value$restartFrom <- NULL
+    resetPipeline(startFrom = NULL)
   })
 
   ## Output some details - useful for troubleshooting
   output$txtDetails <- renderPrint({
     lastDropped <- input$jnt_lastDroppedNode
     selected <- input$jnt_selectedNode
+
+    print(paste0('pauseProcess = ', input$pauseProcess))
+
     print(paste0('Last dropped node = ', lastDropped['name']))
     print(paste0('Selected node = ', selected['name']))
   })
