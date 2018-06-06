@@ -32,18 +32,8 @@ setDefaultIcon('circle-o')
 
 server <- function(input, output, session) {
 
-  ## space to store nodes for execution
-  l.myNodes <- list()
-  value <- reactiveValues(pausePipeline = FALSE)
-
-  print(1)
-
+  ## call module server code
   callModule(jntModule, 'jnt1', l.nodeTypes)
-
-  print(4)
-
-
-
 }
 
 ui <- shinyUI(
