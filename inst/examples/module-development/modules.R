@@ -42,8 +42,6 @@ jntModule <- function(input, output, session, l.nodeTypes) {
   value <- reactiveValues(myNodes = list(),
                           lastNodeId = NULL)
 
-  print(2)
-
   ## Create the htmlwidget
   output$jnt <- renderJointPipeline({
     l.nodes <- lapply(seq(l.nodeTypes), function(p) {
@@ -65,9 +63,6 @@ jntModule <- function(input, output, session, l.nodeTypes) {
     l.nodes <- setNames(l.nodes, names(l.nodeTypes))
     jointPipeline(nodes = l.nodes, icons = TRUE)
   })
-
-  print(3)
-
 
   ## Add a node to the executable list (value$myNodes).
   # This is triggered when a node is added to the graph canvas.
@@ -346,11 +341,6 @@ jntModule <- function(input, output, session, l.nodeTypes) {
           } else if (p$type == 'file') {
             l.parameters <- c(l.parameters, setNames(p$value, p$name))
           } else if (p$type == 'nodeinput') {  ## output from last node pushed in as input to current node
-
-            # print(p$name)
-            # print(node$input)
-            # print(value$myNodes[[node$input[[p$name]]]]$output)
-
             l.parameters <- c(l.parameters, setNames(value$myNodes[[node$input[[p$name]]]]$output, p$name))
           }
         }
@@ -394,12 +384,6 @@ jntModule <- function(input, output, session, l.nodeTypes) {
 
     ## Set button states
     session$sendCustomMessage("disableButton", list(button = ns('butRun'), disabled = FALSE))
-
-    lapply(value$myNodes, function(n) {
-      print(n$output)
-    })
-
-
   })
 
   observeEvent(input$butRun, {
