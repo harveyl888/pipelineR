@@ -11,8 +11,6 @@ library(simpleMathNodes)
 
 ## implementation using shiny module
 
-source('modules.R')
-
 ## Define the packages containing nodes to use in this app
 ## If more than one package is used send as a vector
 nodePackages <- 'simpleMathNodes'
