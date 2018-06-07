@@ -183,7 +183,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
   # Perform a depth-first search on a pipeline.  Initial node is determined in jointPipeline.js
   # by identifying the first node without an input.  If all nodes have input then the first
   # node added is used.
-  pipelineDFS1 <- function()
+  pipelineDFS <- function()
   {
     df.links <- input$jnt_links
     if (nrow(df.links) > 0) {
@@ -210,7 +210,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
 
   # Determine if pipeline is a directed acyclic graph.  If graph is cyclic there's a danger of
   # getting caught in an infinite loop.
-  isDAG1 <- function() {
+  isDAG <- function() {
     df.links <- input$jnt_links
     if (nrow(df.links) > 0) {
       g <- make_directed_graph(edges = unlist(as.vector(t(df.links[, c('source_id', 'target_id')]))))
@@ -221,7 +221,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
   }
 
   # Determine if pipeline contains input ports with no data
-  openInputs1 <- function() {
+  openInputs <- function() {
     df.ports <- input$jnt_ports
     if (nrow(df.ports) > 0) {
       numOpenPorts = nrow(df.ports[df.ports$port_type == 'in' & df.ports$connected == FALSE, ])
@@ -233,7 +233,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
 
 
   # Change the status of a node.  Status is shown by changing the border around the node.
-  changeStatus1 <- function(id = NULL, status = NULL) {
+  changeStatus <- function(id = NULL, status = NULL) {
     if (is.null(id)) return()
     led <- FALSE
     if (status == 'none') {
@@ -258,7 +258,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
 
 
   # Set delete button to visible or hidden
-  deleteButton1 <- function(id = NULL, state = TRUE) {
+  deleteButton <- function(id = NULL, state = TRUE) {
     if (is.null(id)) return()
     session$sendCustomMessage(type = 'deleteButton',
                               message = list(id = id, state = state))
@@ -296,7 +296,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
     }
 
     ## Do we have a directed acyclic graph?
-    if (!isDAG1()) {
+    if (!isDAG()) {
       error <- TRUE
       showModal(modalDialog(title = 'Graph Error',
                             'Error in graph.  Not directed acyclic',
@@ -304,7 +304,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
     }
 
     ## Do we have an open input?
-    if (openInputs1()) {
+    if (openInputs()) {
       error <- TRUE
       showModal(modalDialog(title = 'Graph Error',
                             'Error in graph.  Check for open inputs',
@@ -312,11 +312,11 @@ jntModule <- function(input, output, session, l.nodeTypes) {
     }
 
     if(!error) {
-      runNodeOrder <- pipelineDFS1()
+      runNodeOrder <- pipelineDFS()
       allDisplayedNodes <- runNodeOrder
 
       ## hide delete buttons
-      sapply(allDisplayedNodes, function(x) deleteButton1(id = x, state = FALSE))
+      sapply(allDisplayedNodes, function(x) deleteButton(id = x, state = FALSE))
 
       if (!is.null(continueFrom)) {  # start from a specific node
         startNodeRef <- match(continueFrom, sapply(runNodeOrder, function(x) x$id))
@@ -328,9 +328,9 @@ jntModule <- function(input, output, session, l.nodeTypes) {
 
       runNodeOrder <- runNodeOrder[startNodeRef:length(runNodeOrder)]
 
-      sapply(runNodeOrder, function(x) changeStatus1(id = x$id, status = 'queued'))
+      sapply(runNodeOrder, function(x) changeStatus(id = x$id, status = 'queued'))
       for (node in runNodeOrder) {  # loop through each executable node
-        changeStatus1(id = value$myNodes[[node$id]]$id, status = 'running')
+        changeStatus(id = value$myNodes[[node$id]]$id, status = 'running')
         type <- value$myNodes[[node$id]]$type
         package <- value$myNodes[[node$id]]$package
         parameters <- value$myNodes[[node$id]]$parameters
@@ -346,11 +346,11 @@ jntModule <- function(input, output, session, l.nodeTypes) {
         }
         execute <- executeNode(type, package, l.parameters)  # execute the node
         if (execute$result == 'success') {
-          changeStatus1(id = value$myNodes[[node$id]]$id, status = 'completed')
+          changeStatus(id = value$myNodes[[node$id]]$id, status = 'completed')
           value$myNodes[[node$id]]$status <- 'completed'
           value$myNodes[[node$id]]$output <- execute$output  # store the output
         } else {
-          changeStatus1(id = value$myNodes[[node$id]]$id, status = 'error')
+          changeStatus(id = value$myNodes[[node$id]]$id, status = 'error')
           value$myNodes[[node$id]]$status <- 'error'
           showModal(modalDialog(title = 'Node Error',
                                 h4(paste0('Error in node: ', value$myNodes[[node$id]]$id)),
@@ -378,7 +378,7 @@ jntModule <- function(input, output, session, l.nodeTypes) {
        }
 
       ## restore delete buttons
-      sapply(allDisplayedNodes, function(x) deleteButton1(id = x, state = TRUE))
+      sapply(allDisplayedNodes, function(x) deleteButton(id = x, state = TRUE))
 
     }
 
