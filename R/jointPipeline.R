@@ -201,6 +201,12 @@ jntModuleUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
+      tags$script(HTML(
+        '$(document).ready(function() {
+          Shiny.addCustomMessageHandler("disableButton", function(x) {
+            $("#" + x.button).prop("disabled", x.disabled) });
+        });'
+      )),
       column(8,
              jointPipelineOutput(ns('jnt'), height='600px')
       ),

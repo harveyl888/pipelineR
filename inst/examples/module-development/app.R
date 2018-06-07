@@ -36,7 +36,6 @@ server <- function(input, output, session) {
 
 ui <- shinyUI(
   fluidPage(
-    tags$head(tags$script(src="buttons.js")),
     br(),
     jntModuleUI('jnt1')
   )
